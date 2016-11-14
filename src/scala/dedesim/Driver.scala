@@ -1,7 +1,7 @@
 package curoles.dedesim
 
 import curoles.dedesim._
-//import edc.Wire.Level
+import curoles.dedesim.Simulator.sim
 
 object Driver {
     def driver(sigVal: Wire#Level, output: Wire): Unit= {
@@ -22,8 +22,8 @@ object Driver {
     def clock(period: Int, output: Wire) {
         def clockAction() = {
             val currentLevel = output.getSignal
-            output.sim.afterDelay(period) {
-                output.sim.log(s"clock ${currentLevel} -> ${!currentLevel}")
+            sim.afterDelay(period) {
+                sim.log(s"clock ${currentLevel} -> ${!currentLevel}")
                 output setSignal !currentLevel
             }
         }

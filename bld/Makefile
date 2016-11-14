@@ -3,6 +3,9 @@
 # author: Igor Lesik
 # copyright: Igor Lesik 2016
 
+# All = installation
+.PHONY: all
+all: installation
 
 EMPTY :=
 SPACE := $(EMPTY) $(EMPTY)
@@ -31,9 +34,6 @@ build_all: scala
 .PHONY: installation
 installation: build_all install_jars install_scripts
 
-# All = install
-.PHONY: all
-all: installation
 
 # A phony target should not be a prerequisite of a real target file;
 # if it is, its recipe will be run every time make goes to update that file.

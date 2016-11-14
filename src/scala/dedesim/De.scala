@@ -1,5 +1,7 @@
 package curoles.dedesim
 
+//Scaladoc: https://wiki.scala-lang.org/display/SW/Syntax
+
 /** Discrete Event.
  *
  *

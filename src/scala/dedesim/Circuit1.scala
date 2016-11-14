@@ -1,15 +1,14 @@
 package curoles.dedesim
 
-class Circuit1(simi: Simulation) {
+import curoles.dedesim.Simulator.sim
 
-    val sim: Simulation = simi;
+class Circuit1 {
 
     sim.log("new circuit")
 
-    val reset = new Wire(sim)
+    val reset = new Wire
 
-    val clk = new Wire(sim)
+    val clk = new Wire
 
     Driver.clock(2, clk)
-    clk.setSignal(true)
 }

@@ -7,7 +7,9 @@ SCALA_EXTRA_LIB_DIR := $(SCALA_BUILD_DIR)/extralib
 
 SCALA_SRCs := 
 SCALA_SRCs += dedesim/De.scala
-SCALA_SRCs += dedesim/Simulation.scala dedesim/Wire.scala dedesim/Driver.scala
+SCALA_SRCs += dedesim/Simulation.scala dedesim/Simulator.scala
+SCALA_SRCs += dedesim/Trigger.scala
+SCALA_SRCs += dedesim/Wire.scala dedesim/Driver.scala
 SCALA_SRCs += dedesim/Circuit1.scala dedesim/SimRunner.scala
 
 # Scala source files with the path.
@@ -43,4 +45,8 @@ scala_doc: $(SCALA_SRCS)
 	mkdir -p ./build/doc/scala
 	scaladoc -d ./build/doc/scala $(SCALAC_FLAGS) $(SCALA_SRCS)
 
-
+.PHONY: scala_test
+scala_test: classpath := "./build/scala/class:./build/scala/extralib/*"
+scala_test: run_scala_test := scala -cp $(classpath) org.scalatest.run
+scala_test:
+	$(run_scala_test) curoles.dedesim.TriggerSpec

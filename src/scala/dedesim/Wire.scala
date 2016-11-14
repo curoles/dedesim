@@ -1,29 +1,48 @@
 package curoles.dedesim
 
-import curoles.dedesim.De.Action
-//import curoles.dedesim.Simulation
+import curoles.dedesim.Simulator.sim
 
-class Wire(simi: Simulation) {
+/** Wire represents an electrical wire.
+ *
+ *  Wire is Trigger object, when a signal on wire
+ *  changes it can trigger changes for other wires
+ *  and Trigger objects. 
+ */
+class Wire extends Trigger {
 
-    val sim: Simulation = simi;
-
+    /** Wire can have only 2 states: HI or LOW */
     type Level = Boolean
 
+    /** Current value */
     private var sigVal: Level = false
-    private var actions: List[Action] = List()
 
+    /** Get current value */
     def getSignal : Level = sigVal
 
+    /** Change value if new value != current value */
     def setSignal(newSigVal: Level) : Unit = {
         if (newSigVal != sigVal) {
             sigVal = newSigVal
-            actions foreach (_ ())
+            act // trigger associated actions
         }
     }
 
-    def addAction(a: Action) = {
+    /*override def addAction(a: Action) = {
         sim.log("wire add action:" + a.toString)
         actions = a :: actions
         a()
-    }
+    }*/
 }
+
+class Wires(val width: Int) extends Trigger {
+    require(width > 0)
+    
+    type WireArray = Array[Wire]
+
+    val bit = new WireArray(width)
+
+    def setSignal(bitNum: Int, newVal: Wire#Level) = bit(bitNum).setSignal(newVal)
+}
+
+
+

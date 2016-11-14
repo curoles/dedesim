@@ -17,6 +17,7 @@ class Simulation {
 
     type Agenda = List[WorkItem]
 
+    /** List of items to do */
     private var agenda: Agenda = List()
 
     private def insert(ag: Agenda, item: WorkItem): Agenda = {
@@ -39,10 +40,10 @@ class Simulation {
         }
     }
 
-    def run() = {
-        afterDelay(0) { log("simulation started") }
+    def run(maxTime: Int = 10) = {
+        afterDelay(0) { log("Simulation started!") }
 
-        while (!agenda.isEmpty && currentTime < 10) next()
+        while (!agenda.isEmpty && currentTime < maxTime) next()
     }
 }
 
