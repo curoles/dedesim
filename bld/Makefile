@@ -37,7 +37,9 @@ installation: build_all install_jars install_scripts
 
 # A phony target should not be a prerequisite of a real target file;
 # if it is, its recipe will be run every time make goes to update that file.
+$(INSTALL_PATH)/dedesim.jar: GET_RELEASE := git -C $(SOURCE_PATH) rev-list HEAD --count
 $(INSTALL_PATH)/dedesim.jar: $(INSTALL_PATH) $(SCALA_OBJS)
+	$(GET_RELEASE) > $(SCALA_CUROLES_CLASS_DIR)/dedesim/release.txt
 	jar cvf $@ -C $(SCALA_CLASS_DIR) . 
 
 .PHONY: install_jars

@@ -5,12 +5,16 @@ final class Version {
     val Minor = 1
 
     override def toString: String = {
-        Major.toString + "." + Minor.toString + "." + releaseStr
+        Major.toString + "." + Minor.toString + ".r" + releaseStr
     }
 
     def releaseStr: String = {
-        //ClassLoader cl = this.getClass().getClassLoader();
-        //java.io.InputStream in = cl.getResourceAsStream("curoles/dedesim/release.txt");
-        "TODO"
+        val cl = getClass.getClassLoader
+        val path = "curoles/dedesim/release.txt"
+        val in: java.io.InputStream = cl.getResourceAsStream(path)
+        val release: String =
+            new java.io.BufferedReader(new java.io.InputStreamReader(in)
+            ).lines().collect(java.util.stream.Collectors.joining("\n"))
+        release
     }
 }

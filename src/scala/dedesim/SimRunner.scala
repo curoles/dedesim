@@ -26,14 +26,17 @@ object SimRunner {
             |DeDeSim does not have any command line options.
             |Instead any argument is treated as string of Scala script to execute,
             |or name of a file with Scala script.
+            |
+            |For example, to get version information:
+            |dedesim 'println(simulator.version)'
             |""".stripMargin
         println(helpStr)
         SysOK
     }
 
     def run(args: Array[String]): Int = {
-        println("Arguments: " + args.mkString(" "))
-        println("Version: " + Simulator.version)
+        //println("Arguments: " + args.mkString(" "))
+        println("DeDeSim " + Simulator.version + " by Igor Lesik 2016")
         runJobs(args)
         val circuit = new Circuit1
         sim.run()
@@ -47,7 +50,8 @@ object SimRunner {
 
     def runJob(job: String): Unit = {
         sim.log("Job: " + job)
-        runScalaScript("""println("Hi")""")
+        val jobScript = getJobScript(job)
+        runScalaScript(jobScript)
     }
 
     def runScalaScript(code: String): Unit = {
@@ -57,6 +61,27 @@ object SimRunner {
         val cm = universe.runtimeMirror(getClass.getClassLoader)
         val tb = cm.mkToolBox()
  
-        tb.eval(tb.parse(code)) 
+        tb.eval(tb.parse(Preamble + code))
     }
+
+    /** Job is either file with script or script */
+    def getJobScript(job: String): String = {
+        import java.nio.file.{Paths, Files}
+
+        if (Files.exists(Paths.get(job)))
+            io.Source.fromFile(job).mkString
+        else
+            job
+    }
+
+    val Preamble = """
+      |import scala.reflect.runtime.{universe => ru}
+      |val m = ru.runtimeMirror(getClass.getClassLoader)
+      |val simSymbol = m.staticModule("curoles.dedesim.Simulator")
+      |val simMirror = m.reflectModule(simSymbol)
+      |val simulatorInstance = simMirror.instance.asInstanceOf[curoles.dedesim.Simulator.type]
+      |val simulator = simulatorInstance
+      |val sim = simulator.sim
+      |//sim.log("preamble parsed and evaluated")
+      |""".stripMargin
 }
