@@ -44,9 +44,8 @@ $(INSTALL_PATH)/dedesim.jar: $(INSTALL_PATH) $(SCALA_OBJS)
 install_jars: $(INSTALL_PATH)/dedesim.jar
 	cp $(SCALA_EXTRA_LIB_DIR)/*.jar $(INSTALL_PATH)/.
 
-$(INSTALL_PATH)/dedesim:
-	echo "#!/bin/sh" > $@
-	echo 'scala -cp "./install/*" curoles.dedesim.SimRunner' >> $@
+$(INSTALL_PATH)/dedesim: $(BLD)/dedesim.bash
+	cp $(BLD)/dedesim.bash $@
 	chmod a+x $@
 
 .PHONY: install_scripts

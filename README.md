@@ -37,3 +37,11 @@ Check that file called 'Makefile' was generated:
 config.makefile  Makefile
 ```
 
+## Build
+
+Issue following command inside the build directory:
+```
+> make
+```
+
+
