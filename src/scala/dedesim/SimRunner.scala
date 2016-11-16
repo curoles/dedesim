@@ -16,30 +16,33 @@ object SimRunner {
      *
      */
     def main(args: Array[String]): Unit = {
+        println("DeDeSim " + Simulator.version + " by Igor Lesik 2016")
+
         val exitCode = if (args.isEmpty) showHelp()
                        else              run(args)
+
         sys.exit(exitCode)
     }
 
     def showHelp(): Int = {
         val helpStr = """
             |DeDeSim does not have any command line options.
-            |Instead any argument is treated as string of Scala script to execute,
+            |Instead any argument is treated as a string of Scala script,
             |or name of a file with Scala script.
             |
-            |For example, to get version information:
-            |dedesim 'println(simulator.version)'
+            |Option-like Scala commands:
+            |  Print version: dedesim "println(simulator.version)"
+            |
+            |Example of how to run circuit simulation:
+            |dedesim "val circuit = new curoles.dedesim.test.circuit.clk.TB; sim.run(10)"
             |""".stripMargin
         println(helpStr)
         SysOK
     }
 
     def run(args: Array[String]): Int = {
-        //println("Arguments: " + args.mkString(" "))
-        println("DeDeSim " + Simulator.version + " by Igor Lesik 2016")
+        //println("Arguments: " + args.mkString(" -|- "))
         runJobs(args)
-        val circuit = new Circuit1
-        sim.run()
 
         SysOK
     }

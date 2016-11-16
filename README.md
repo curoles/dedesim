@@ -1,6 +1,10 @@
 # DeDeSim
 Digital Electronics Discrete Event Simulation
 
+Similar to SystemC, DeDeSim is a tool to build architectural models.
+At this point it is nothing more than an example of circuit simulation
+from book "Programming in Scala".
+
 ## Setup GIT
 
 ```
@@ -44,4 +48,12 @@ Issue following command inside the build directory:
 > make
 ```
 
+To run tests:
+```
+> make test
+```
 
+To generate documentation:
+```
+> make doc
+```

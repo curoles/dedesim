@@ -10,6 +10,9 @@ all: installation
 EMPTY :=
 SPACE := $(EMPTY) $(EMPTY)
 
+# Path where applications are installed.
+INSTALL_PATH := ./install
+
 # Path to build files
 BLD := $(SOURCE_PATH)/bld
 
@@ -17,9 +20,8 @@ include $(BLD)/java.makefile
 include $(BLD)/scala.makefile
 include $(BLD)/rules.makefile
 include $(BLD)/doc.makefile
+include $(BLD)/test.makefile
 
-# Path where applications are installed.
-INSTALL_PATH := ./install
 
 # Target creates installation directory.
 $(INSTALL_PATH):
@@ -40,10 +42,14 @@ installation: build_all install_jars install_scripts
 $(INSTALL_PATH)/dedesim.jar: GET_RELEASE := git -C $(SOURCE_PATH) rev-list HEAD --count
 $(INSTALL_PATH)/dedesim.jar: $(INSTALL_PATH) $(SCALA_OBJS)
 	$(GET_RELEASE) > $(SCALA_CUROLES_CLASS_DIR)/dedesim/release.txt
-	jar cvf $@ -C $(SCALA_CLASS_DIR) . 
+	jar cvf $@ -C $(SCALA_CLASS_DIR) .
+	zip -d $@ curoles/dedesim/test/*
+
+$(INSTALL_PATH)/dedesim_test_circuits.jar: $(INSTALL_PATH) $(SCALA_OBJS)
+	jar cvf $@ -C $(SCALA_CLASS_DIR) curoles/dedesim/test/circuit 
 
 .PHONY: install_jars
-install_jars: $(INSTALL_PATH)/dedesim.jar
+install_jars: $(INSTALL_PATH)/dedesim.jar $(INSTALL_PATH)/dedesim_test_circuits.jar
 	cp $(SCALA_EXTRA_LIB_DIR)/*.jar $(INSTALL_PATH)/.
 
 $(INSTALL_PATH)/dedesim: $(BLD)/dedesim.bash

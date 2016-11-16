@@ -11,7 +11,9 @@ SCALA_SRCs += dedesim/De.scala
 SCALA_SRCs += dedesim/Simulation.scala dedesim/Simulator.scala
 SCALA_SRCs += dedesim/Trigger.scala
 SCALA_SRCs += dedesim/Wire.scala dedesim/Driver.scala
-SCALA_SRCs += dedesim/Circuit1.scala dedesim/SimRunner.scala
+SCALA_SRCs += dedesim/SimRunner.scala
+
+include $(BLD)/test_circuits.makefile
 
 # Scala source files with the path.
 SCALA_SRCS := $(addprefix $(SCALA_SRC_DIR)/,$(SCALA_SRCs))
