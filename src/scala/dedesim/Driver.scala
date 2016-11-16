@@ -19,6 +19,14 @@ object Driver {
         driver(if (sigVal == 'hi) true else false, output)
     }
 
+    /** Generates periodic signal.
+     *
+     *  <pre class="textdiagram">
+     *    +--+  +--+
+     *    |  |  |  |
+     *  --+  +--+  +--
+     *  </pre>
+     */
     def clock(period: Int, output: Wire) {
         def clockAction() = {
             val currentLevel = output.getSignal

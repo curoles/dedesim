@@ -11,3 +11,13 @@ $(MAIN_DOCS_BUILD_DIR):
 
 .PHONY: doc
 doc: main_doc scala_doc
+
+.PHONY: doc_ditaa
+doc_ditaa: DITAA := /home/igor/tool/ditaa/ditaa
+doc_ditaa: HTML_FILES := $(shell find $(abspath $(DOCS_BUILD_DIR)) -type f -name '*.html')
+doc_ditaa: doc
+	@echo Generate DITAA diagrams
+	@- $(foreach file,$(HTML_FILES), \
+		cd $(dir $(file)) && $(DITAA) --html $(file) -o $(file) ; \
+	)
+
