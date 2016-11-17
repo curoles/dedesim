@@ -19,12 +19,15 @@ object Driver {
         driver(if (sigVal == 'hi) true else false, output)
     }
 
-    /** Generates periodic signal.
+    /** Generates periodic symmetrical clock signal.
+     *
+     *  @param period time from rising to falling edge
      *
      *  <pre class="textdiagram">
-     *    +--+  +--+
-     *    |  |  |  |
-     *  --+  +--+  +--
+     *    +----------+          +----------+          +----------+
+     *    |          |          |          |          |          |
+     *  --+          +----------+          +----------+          +--
+     *     <-period-> <-period->
      *  </pre>
      */
     def clock(period: Int, output: Wire) {
@@ -37,4 +40,29 @@ object Driver {
         }
         output addAction clockAction
     }
+
+    /** Generates periodic asymmetrical clock signal.
+     *
+     *  @param lowPeriod time falling to rising edge
+     *  @param hiPeriod time rising to falling edge
+     *
+     *  <pre class="textdiagram">
+     *    +----------+       +----------+       +----------+
+     *    |          |       |          |       |          |
+     *  --+          +-------+          +-------+          +--
+     *     <---hi---> <-low->
+     *  </pre>
+     */
+    def clock(lowPeriod: Int, hiPeriod: Int, output: Wire) {
+        def clockAction() = {
+            val currentLevel = output.getSignal
+            val period = if (currentLevel == true) hiPeriod else lowPeriod
+            sim.afterDelay(period) {
+                sim.log(s"clock ${currentLevel} -> ${!currentLevel}")
+                output setSignal !currentLevel
+            }
+        }
+        output addAction clockAction
+    }
+
 }

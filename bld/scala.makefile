@@ -11,6 +11,7 @@ SCALA_SRCs += dedesim/De.scala
 SCALA_SRCs += dedesim/Simulation.scala dedesim/Simulator.scala
 SCALA_SRCs += dedesim/Trigger.scala
 SCALA_SRCs += dedesim/Wire.scala dedesim/Driver.scala
+SCALA_SRCs += dedesim/util/VCDWriter.scala
 SCALA_SRCs += dedesim/SimRunner.scala
 
 include $(BLD)/test_circuits.makefile
