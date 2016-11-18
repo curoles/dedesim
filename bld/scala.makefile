@@ -8,6 +8,7 @@ SCALA_EXTRA_LIB_DIR := $(SCALA_BUILD_DIR)/extralib
 SCALA_SRCs := 
 SCALA_SRCs += dedesim/Version.scala
 SCALA_SRCs += dedesim/De.scala
+SCALA_SRCs += dedesim/Component.scala dedesim/RootModule.scala
 SCALA_SRCs += dedesim/Simulation.scala dedesim/Simulator.scala
 SCALA_SRCs += dedesim/Trigger.scala
 SCALA_SRCs += dedesim/Wire.scala dedesim/Driver.scala

@@ -8,7 +8,9 @@ import curoles.dedesim.Simulator.sim
  *  changes it can trigger changes for other wires
  *  and Trigger objects. 
  */
-class Wire extends Trigger {
+class Wire(parent: Component, name: String)
+    extends Component(parent, name)
+    with Trigger {
 
     /** Wire can have only 2 states: HI or LOW */
     type Level = Boolean

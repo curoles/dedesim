@@ -14,7 +14,7 @@ import curoles.dedesim.Simulator.sim
  *  object but at this point it does not do all work, instead it
  *  tells global instance of '''`Simulator`''' what to do and __WHEN__. 
  */
-abstract class Trigger {
+trait Trigger {
 
     /** List of all Actions associated with this trigger object */
     protected var actions: List[Action] = List()
