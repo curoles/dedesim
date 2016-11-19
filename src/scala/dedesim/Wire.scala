@@ -1,6 +1,7 @@
 package curoles.dedesim
 
 import curoles.dedesim.Simulator.sim
+import curoles.dedesim.Simulator.msg
 
 /** Wire represents an electrical wire.
  *
@@ -21,10 +22,12 @@ class Wire(parent: Component, name: String)
     /** Get current value */
     def getSignal : Level = sigVal
 
+
     /** Change value if new value != current value */
     def setSignal(newSigVal: Level) : Unit = {
         if (newSigVal != sigVal) {
             sigVal = newSigVal
+            changeEvent(sigVal)
             act // trigger associated actions
         }
     }
@@ -34,6 +37,17 @@ class Wire(parent: Component, name: String)
         actions = a :: actions
         a()
     }*/
+
+    /** Points to current event handler */
+    var changeEvent: (Level) => Unit = /*dontS*/sendChangeEvent
+
+    /** Do not send change event, do nothing */
+    def dontSendChangeEvent(sigVal: Level): Unit = { }
+
+    def sendChangeEvent(sigVal: Level): Unit = {
+        msg.wireEvent(sim.currentTime, id, sigVal)
+    }
+
 }
 
 class Wires(val width: Int) extends Trigger {

@@ -8,6 +8,6 @@ package curoles.dedesim
  *
  *  @author Igor Lesik
  */
-class RootModule(parent: Component, name: String) extends Component(parent, name) {
+class RootModule(parent: Component, name: String) extends Module(parent, name) {
 
 }

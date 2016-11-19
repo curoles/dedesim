@@ -5,7 +5,9 @@ import curoles.dedesim.Simulator.sim
 
 object Driver {
     def driver(sigVal: Wire#Level, output: Wire): Unit= {
-        output setSignal sigVal
+        sim.afterDelay(0) {
+            output setSignal sigVal
+        }
     }
 
     def driver(sigVal: Int, output: Wire): Unit = {

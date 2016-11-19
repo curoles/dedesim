@@ -7,4 +7,6 @@ object Simulator {
     val version = new Version
 
     val root = new RootModule(null, "root")
+
+    val msg = new Messenger
 }

@@ -8,11 +8,13 @@ SCALA_EXTRA_LIB_DIR := $(SCALA_BUILD_DIR)/extralib
 SCALA_SRCs := 
 SCALA_SRCs += dedesim/Version.scala
 SCALA_SRCs += dedesim/De.scala
-SCALA_SRCs += dedesim/Component.scala dedesim/RootModule.scala
+SCALA_SRCs += dedesim/Component.scala dedesim/Module.scala dedesim/RootModule.scala
+SCALA_SRCs += dedesim/Messenger.scala
 SCALA_SRCs += dedesim/Simulation.scala dedesim/Simulator.scala
 SCALA_SRCs += dedesim/Trigger.scala
-SCALA_SRCs += dedesim/Wire.scala dedesim/Driver.scala
-SCALA_SRCs += dedesim/util/VCDWriter.scala
+SCALA_SRCs += dedesim/Wire.scala
+SCALA_SRCs += dedesim/Driver.scala dedesim/Basic.scala
+SCALA_SRCs += dedesim/util/VCDWriter.scala dedesim/VCDumper.scala
 SCALA_SRCs += dedesim/SimRunner.scala
 
 include $(BLD)/test_circuits.makefile

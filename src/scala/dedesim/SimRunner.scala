@@ -85,6 +85,7 @@ object SimRunner {
       |val simulatorInstance = simMirror.instance.asInstanceOf[curoles.dedesim.Simulator.type]
       |val simulator = simulatorInstance
       |val sim = simulator.sim
+      |class VCD(f:String) extends curoles.dedesim.VCDumper(f,simulator.msg,simulator.root)
       |//sim.log("preamble parsed and evaluated")
       |""".stripMargin
 }

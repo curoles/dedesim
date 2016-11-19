@@ -34,6 +34,16 @@ abstract class Component(val parent: Component, val name: String) {
 
     def isEmpty = subComponents.isEmpty
 
+    def foreach[U](f: (String,Component) => U):Unit = {
+        if (!isEmpty) for ((componentName,component) <- subComponents.get) {
+            f(componentName, component)
+            component.foreach(f)
+        }
+
+    }
+
+    val id: String = if (parent eq null) name else parent.id + "." + name
+
     def hierarchyString(level: Int = 0): String = {
         var s = (" " * level) + name
         if (!isEmpty) for ((componentName,component) <- subComponents.get) {

@@ -4,8 +4,8 @@ import curoles.dedesim.De.Action
 
 class Simulation {
 
-    private var curtime = 0
-    def currentTime: Int = curtime
+    private var curtime: Long = 0
+    def currentTime: Long = curtime
 
     private val printStream: java.io.PrintStream = Console.out
 
@@ -13,7 +13,7 @@ class Simulation {
         printStream.println(f"${currentTime}%4d | " + msg)
     }
 
-    case class WorkItem(time: Int, action: Action)
+    case class WorkItem(time: Long, action: Action)
 
     type Agenda = List[WorkItem]
 
@@ -25,7 +25,7 @@ class Simulation {
         else ag.head :: insert(ag.tail, item)
     }
 
-    def afterDelay(delay: Int)(block: => Unit) = {
+    def afterDelay(delay: Long)(block: => Unit) = {
         val item = WorkItem(currentTime + delay, () => block)
         agenda = insert(agenda, item)
     }
@@ -40,7 +40,7 @@ class Simulation {
         }
     }
 
-    def run(maxTime: Int = 10) = {
+    def run(maxTime: Long = 10) = {
         afterDelay(0) { log("Simulation started!") }
 
         while (!agenda.isEmpty && currentTime < maxTime) next()
