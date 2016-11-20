@@ -19,9 +19,22 @@ class VCDumper(
     def close() = vcd.close()
 
     def defineWires() = {
-        root.foreach((name,x) => vcd.defineWire(x.id, 1))//FIXME size and diff types
-        //vcd.defineWire("root.TB.clk", 1)
+        root.foreach(0, (level,name,x) => defineComponent(level, x))
         vcd.endDefinitions()
+
+        writeInitLevels()
+    }
+
+    def defineComponent(level: Int, c: Component) = {
+        //FIXME TODO if level up then $upscope $end 
+        if (c.cType == 'module) vcd.setModuleScope(c.name)
+        else if (c.cType == 'wire) vcd.defineWire(c.id, 1)
+    }
+
+    def writeInitLevels() = {
+        vcd.write("$dumpvars\n")
+        root.foreach(0, (lvl,name,x) => if (x.cType == 'wire) vcd.change(x.id, false))//FIXME
+        vcd.write("$end\n")
     }
 
     def subscribeForEvents() = {
@@ -30,7 +43,7 @@ class VCDumper(
 
     override def wireEvent(time: Long, id: String, sigVal: Boolean) {
         //println(s"VCD @$time $id changed $sigVal")
-        vcd.setTimestamp(time) //@todo if new time
+        vcd.setTimestamp(time) //@todo if new time FIXME
         vcd.change(id, sigVal)
     }
 

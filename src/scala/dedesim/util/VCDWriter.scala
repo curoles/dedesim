@@ -25,6 +25,8 @@ class VCDWriter(
     /** Close the file */
     def close() = writer.close()
 
+    def write(s: String) = writer.write(s)
+
     def header(version: String, timescale: String, comment: String): String = {
         s"""
         |$$date
@@ -42,9 +44,12 @@ class VCDWriter(
     }
 
     def defineWire(id: String, size: Int): Unit = {
-writer.write("$scope module m1 $end\n")
         val s = s"$$var wire $size $id $id $$end\n"
         writer.write(s)
+    }
+
+    def setModuleScope(name: String): Unit = {
+        writer.write(s"$$scope module $name $$end\n")
     }
 
     def setTimestamp(timestamp: Long): Unit = {

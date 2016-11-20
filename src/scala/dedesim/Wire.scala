@@ -10,7 +10,7 @@ import curoles.dedesim.Simulator.msg
  *  and Trigger objects. 
  */
 class Wire(parent: Component, name: String)
-    extends Component(parent, name)
+    extends Component(parent, name, 'wire)
     with Trigger {
 
     /** Wire can have only 2 states: HI or LOW */

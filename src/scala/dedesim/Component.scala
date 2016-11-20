@@ -10,7 +10,7 @@ import scala.collection._
  *
  *  @author Igor Lesik
  */
-abstract class Component(val parent: Component, val name: String) {
+abstract class Component(val parent: Component, val name: String, val cType: Symbol) {
 
     registerWithParent()
 
@@ -34,10 +34,10 @@ abstract class Component(val parent: Component, val name: String) {
 
     def isEmpty = subComponents.isEmpty
 
-    def foreach[U](f: (String,Component) => U):Unit = {
+    def foreach[U](level: Int, f: (Int,String,Component) => U):Unit = {
         if (!isEmpty) for ((componentName,component) <- subComponents.get) {
-            f(componentName, component)
-            component.foreach(f)
+            f(level, componentName, component)
+            component.foreach(level + 1, f)
         }
 
     }

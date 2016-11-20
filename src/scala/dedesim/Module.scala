@@ -14,7 +14,8 @@ import scala.collection._
  *  Module normally has sub-components. Module adds helpers to class Component
  *  that allow for syntactic sugar.
  */
-class Module(parent: Component, name: String) extends Component(parent, name) {
+class Module(parent: Component, name: String)
+    extends Component(parent, name, 'module) {
 
     /** Gets wire with the name or creates it.
      * 
