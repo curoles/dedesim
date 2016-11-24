@@ -8,7 +8,23 @@ package clk
 import curoles.dedesim.Simulator.sim
 import curoles.dedesim.Basic._
 
-class DUT(parent: Component, name: String) extends Module(parent, name) {
+class DUT(
+    parent: Component,
+    name: String,
+    clk: Wire
+)
+    extends Module(parent, name) {
+
+    val clkn = wire("clkn")
+
+    inverter(clk, clkn)
+
+    val bus1 = new Wires(this, "bus1", 3)
+
+    bus1.wires(0) = clk
+    bus1.wires(1) = clkn
+
+    Driver.drive('HI, bus1.wires(2))
 }
 
 class TB(parent: Component, name: String) extends Module(parent, name) {
@@ -27,7 +43,7 @@ class TB(parent: Component, name: String) extends Module(parent, name) {
 
     Driver.clock(period = 2, clk)
 
-    val dut = new DUT(this, "DUT")
+    val dut = new DUT(this, "DUT", clk)
 }
 
 

@@ -56,7 +56,7 @@ class VCDWriter(
         writer.write(s"#$timestamp\n")
     }
 
-    def change(id: String, value: Boolean): Unit = {
+    /*def change(id: String, value: Boolean): Unit = {
         val vstr = "b" + (if (value) 1 else 0).toString
         writer.write(vstr + " " + id + "\n")
     }
@@ -64,5 +64,16 @@ class VCDWriter(
     def change(timestamp: Long, id: String, value: Boolean): Unit = {
         setTimestamp(timestamp)
         change(id, value)
+    }*/
+
+    def change(id: String, value: Int, width: Int): Unit = {
+        val vstr = "b" + value.toBinaryString
+        writer.write(vstr + " " + id + "\n")
     }
+
+    def change(timestamp: Long, id: String, value: Int, width: Int): Unit = {
+        setTimestamp(timestamp)
+        change(id, value, width)
+    }
+
 }

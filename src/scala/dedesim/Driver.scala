@@ -4,21 +4,21 @@ import curoles.dedesim._
 import curoles.dedesim.Simulator.sim
 
 object Driver {
-    def driver(sigVal: Wire#Level, output: Wire): Unit= {
+    def drive(sigVal: Wire#Level, output: Wire): Unit= {
         sim.afterDelay(0) {
             output setSignal sigVal
         }
     }
 
-    def driver(sigVal: Int, output: Wire): Unit = {
+    def drive(sigVal: Int, output: Wire): Unit = {
         require(sigVal == 1 || sigVal == 0)
-        driver(if (sigVal == 1) true else false, output)
+        drive(if (sigVal == 1) true else false, output)
     }
 
-    // 'hi 'lo
-    def driver(sigVal: Symbol, output: Wire): Unit = {
-        require(sigVal == 'hi || sigVal == 'lo)
-        driver(if (sigVal == 'hi) true else false, output)
+    // 'HI 'LO
+    def drive(sigVal: Symbol, output: Wire): Unit = {
+        require(sigVal == 'HI || sigVal == 'LO)
+        drive(if (sigVal == 'HI) true else false, output)
     }
 
     /** Generates periodic symmetrical clock signal.
