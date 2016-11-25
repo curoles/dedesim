@@ -21,8 +21,8 @@ class DUT(
 
     val bus1 = new Wires(this, "bus1", 3)
 
-    bus1.wires(0) = clk
-    bus1.wires(1) = clkn
+    follow(clk, bus1.wires(0))
+    follow(clkn, bus1.wires(1))
 
     Driver.drive('HI, bus1.wires(2))
 

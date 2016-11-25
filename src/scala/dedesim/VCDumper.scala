@@ -65,4 +65,13 @@ class VCDumper(
         vcd.change(id, if (sigVal) 1 else 0, 1)
     }
 
+    override def wireEvent(time: Long, id: String, sigVal: Long, width: Int) {
+        //println(s"VCD @$time $id changed $sigVal")
+        if (time != lastTimestamp) {
+            lastTimestamp = time
+            vcd.setTimestamp(time)
+        }
+        vcd.change(id, sigVal, width)
+    }
+
 }

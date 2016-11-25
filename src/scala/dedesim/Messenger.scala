@@ -16,5 +16,11 @@ class Messenger {
         //println(s"@$time signal $id changed to $sigVal")
         subscribers foreach (x => x.wireEvent(time, id, sigVal))
     }
+
+    def wireEvent(time: Long, id: String, sigVal: Long, width: Int) {
+        //println(s"@$time signal $id changed to $sigVal")
+        subscribers foreach (x => x.wireEvent(time, id, sigVal, width))
+    }
+
 }
 

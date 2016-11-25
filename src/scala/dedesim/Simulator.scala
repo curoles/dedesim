@@ -10,8 +10,12 @@ object Simulator {
 
     val msg = new Messenger
 
-    def wireChangeEvent(wireId: String, sigVal: Boolean): Unit = {
-        msg.wireEvent(sim.currentTime, wireId, sigVal)
+    def wireChangeEvent(wire: Wire): Unit = {
+        msg.wireEvent(sim.currentTime, wire.id, wire.getSignal)
+        if (wire.parent.cType == 'wires) {
+            val ws = wire.parent.asInstanceOf[Wires]
+            msg.wireEvent(sim.currentTime, ws.id, ws.getSignalAsInt, ws.width)
+        }
     }
 
     def enableWireEvent() = {

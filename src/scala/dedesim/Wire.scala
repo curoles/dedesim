@@ -30,7 +30,7 @@ class Wire(parent: Component, name: String)
     def setSignal(newSigVal: Level) : Unit = {
         if (newSigVal != sigVal) {
             sigVal = newSigVal
-            changeEvent(id, sigVal)
+            changeEvent(this)
             act // trigger associated actions
         }
     }
@@ -42,10 +42,10 @@ class Wire(parent: Component, name: String)
     }*/
 
     /** Points to current event handler */
-    var changeEvent: (String,Level) => Unit = dontSendChangeEvent
+    var changeEvent: (Wire) => Unit = dontSendChangeEvent
 
     /** Do not send change event, do nothing */
-    def dontSendChangeEvent(wireId: String, sigVal: Level): Unit = { }
+    def dontSendChangeEvent(wire: Wire): Unit = { }
 
     //def sendChangeEvent(sigVal: Level): Unit = {
     //    msg.wireEvent(sim.currentTime, id, sigVal)

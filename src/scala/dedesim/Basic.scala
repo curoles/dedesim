@@ -23,4 +23,15 @@ object Basic {
         }
         input addAction invertAction
     }
+
+    def follow(input: Wire, output: Wire) = {
+        def followAction() = {
+           val inputSig = input.getSignal
+           sim.afterDelay(0) {
+               output setSignal inputSig
+           }
+        }
+        input addAction followAction
+    }
+
 }
