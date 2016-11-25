@@ -1,7 +1,7 @@
 package curoles.dedesim
 
 import curoles.dedesim.De.Action
-import curoles.dedesim.Simulator.sim
+//import curoles.dedesim.Simulator.sim
 
 /** Trigger is an object that triggers actions upon its change. 
  *

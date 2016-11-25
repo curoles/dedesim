@@ -1,7 +1,9 @@
 package curoles.dedesim
 
-import curoles.dedesim.Simulator.sim
-import curoles.dedesim.Simulator.msg
+import scala.collection._
+
+//import curoles.dedesim.Simulator.sim
+//import curoles.dedesim.Simulator.msg
 
 /** Wire represents an electrical wire.
  *
@@ -28,7 +30,7 @@ class Wire(parent: Component, name: String)
     def setSignal(newSigVal: Level) : Unit = {
         if (newSigVal != sigVal) {
             sigVal = newSigVal
-            changeEvent(sigVal)
+            changeEvent(id, sigVal)
             act // trigger associated actions
         }
     }
@@ -40,14 +42,14 @@ class Wire(parent: Component, name: String)
     }*/
 
     /** Points to current event handler */
-    var changeEvent: (Level) => Unit = /*dontS*/sendChangeEvent
+    var changeEvent: (String,Level) => Unit = dontSendChangeEvent
 
     /** Do not send change event, do nothing */
-    def dontSendChangeEvent(sigVal: Level): Unit = { }
+    def dontSendChangeEvent(wireId: String, sigVal: Level): Unit = { }
 
-    def sendChangeEvent(sigVal: Level): Unit = {
-        msg.wireEvent(sim.currentTime, id, sigVal)
-    }
+    //def sendChangeEvent(sigVal: Level): Unit = {
+    //    msg.wireEvent(sim.currentTime, id, sigVal)
+    //}
 
 }
 
@@ -57,20 +59,27 @@ class Wires(parent: Component, name: String, val width: Int)
 {
     require(width > 0)
  
-    type WireArray = Array[Wire]
+    //val bits = new mutable.BitSet(width)
 
-    val wires = new WireArray(width)
-    for { i <- wires.indices } wires(i) = new Wire(this, s"$name[$i]")
+    val wires = new Array[Wire](width)
+    for { i <- wires.indices } wires(i) = new Wire(this, s"$i")
 
+    //def getSignal(bitNum: Int) = bits.contains(bitNum)
     def getSignal(bitNum: Int) = wires(bitNum).getSignal
 
+    //def getSignalAsInt: Long = {
+    //    bits.toBitMask(0) //FIXME other Longs? or this method should return Array[Long]?
+    //}
+
     def getSignalAsInt: Int = {
-        wires.zipWithIndex.foldLeft(0){ case(acc,(wire,i)) => acc + (wire.getSignalAsInt << i) } 
+        wires.zipWithIndex.foldLeft(0){ case(acc,(wire,i)) => acc + (wire.getSignalAsInt << i) }
     }
 
+    //def setSignal(bitNum: Int, newVal: Wire#Level) =
+    //    if (newVal) bits += bitNum else bits -= bitNum
     def setSignal(bitNum: Int, newVal: Wire#Level) = wires(bitNum).setSignal(newVal)
 
-    /*def setSignal(newSigVal: Level) : Unit = {
+    /*def setSignal(newSigVal: Long) : Unit = {
         if (newSigVal != sigVal) {
             sigVal = newSigVal
             changeEvent(sigVal)
@@ -80,6 +89,4 @@ class Wires(parent: Component, name: String, val width: Int)
 
 
 }
-
-
 

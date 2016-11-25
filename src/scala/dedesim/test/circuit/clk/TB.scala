@@ -25,6 +25,8 @@ class DUT(
     bus1.wires(1) = clkn
 
     Driver.drive('HI, bus1.wires(2))
+
+    val b = wire("b")
 }
 
 class TB(parent: Component, name: String) extends Module(parent, name) {
