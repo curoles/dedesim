@@ -34,4 +34,19 @@ object Basic {
         input addAction followAction
     }
 
+    def dff(clk: Wire, input: Wire, output: Wire) = {
+        val ff = new FlipFlop(null, "ff")
+        def dffAction() = {
+           val rising = clk.getSignal == true
+           if (rising) {
+               val inputSig = input.getSignal
+               sim.afterDelay(0) {
+                   ff.setSignal(inputSig)
+                   output setSignal ff.getSignal
+               }
+           }
+        }
+        clk addAction dffAction
+    }
+
 }

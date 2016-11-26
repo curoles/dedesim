@@ -26,7 +26,13 @@ class DUT(
 
     Driver.drive('HI, bus1.wires(2))
 
-    val b = wire("b")
+    val asyncClk = wire("asyncClk")
+
+    Driver.clock(lowPeriod = 1, hiPeriod = 3, asyncClk)
+
+    val asyncClk_ = wire("asyncClk_")
+
+    dff(clk, asyncClk, asyncClk_)
 }
 
 class TB(parent: Component, name: String) extends Module(parent, name) {

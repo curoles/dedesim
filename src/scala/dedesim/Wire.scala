@@ -2,8 +2,6 @@ package curoles.dedesim
 
 import scala.collection._
 
-//import curoles.dedesim.Simulator.sim
-//import curoles.dedesim.Simulator.msg
 
 /** Wire represents an electrical wire.
  *
