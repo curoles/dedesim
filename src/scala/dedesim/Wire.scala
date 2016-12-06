@@ -1,6 +1,6 @@
 package curoles.dedesim
 
-import scala.collection._
+//import scala.collection._
 
 
 /** Wire represents an electrical wire.

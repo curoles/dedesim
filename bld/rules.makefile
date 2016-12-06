@@ -18,7 +18,10 @@ $(error FASTSCALAC is not defined)
 endif
 
 SCALAC_FLAGS := -cp "$(SCALA_CLASS_DIR):$(SCALA_EXTRA_LIB_DIR)/*"
-SCALAC_FLAGS += -Xlint
+SCALAC_FLAGS += -Xlint -Xfatal-warnings
+#SCALAC_FLAGS += -Ywarn-adapted-args -Ywarn-dead-code -Ywarn-inaccessible -Ywarn-infer-any
+#SCALAC_FLAGS += -Ywarn-nullary-override -Ywarn-nullary-unit -Ywarn-numeric-widen -Ywarn-unused
+#SCALAC_FLAGS += -Ywarn-unused-import -Ywarn-value-discard
 
 THE_SCALAC := $(FASTSCALAC)
 

@@ -24,7 +24,7 @@ class DUT(
     follow(clk, bus1.wires(0))
     follow(clkn, bus1.wires(1))
 
-    Driver.drive('HI, bus1.wires(2))
+    Driver.drive('HI, bus1.wires(2), 0)
 
     val asyncClk = wire("asyncClk")
 

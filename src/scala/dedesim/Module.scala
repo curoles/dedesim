@@ -4,7 +4,7 @@
 
 package curoles.dedesim
 
-import scala.collection._
+//import scala.collection._
 
 /** Module is Component that contains other sub-components.
  *
@@ -25,5 +25,11 @@ class Module(parent: Component, name: String)
         if (!subComponents.contains(name)) new Wire(this, name)
         else subComponents.get.apply(name).asInstanceOf[Wire]
     }
+
+    def wires(name: String, width: Int): Wires = {
+        if (!subComponents.contains(name)) new Wires(this, name, width)
+        else subComponents.get.apply(name).asInstanceOf[Wires]
+    }
+
 
 }

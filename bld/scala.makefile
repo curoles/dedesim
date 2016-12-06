@@ -27,6 +27,7 @@ SCALA_OBJS := $(addprefix $(SCALA_CUROLES_CLASS_DIR)/,$(SCALA_OBJs))
 
 .PHONY: scala
 scala: $(SCALA_CLASS_DIR) scala_extra_libs $(SCALA_OBJS)
+	$(THE_SCALAC) $(SCALAC_FLAGS) -d $(SCALA_CLASS_DIR) $(SCALA_SRCS)
 
 $(SCALA_CLASS_DIR):
 	mkdir -p $(SCALA_CLASS_DIR)

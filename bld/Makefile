@@ -11,7 +11,7 @@ EMPTY :=
 SPACE := $(EMPTY) $(EMPTY)
 
 # Path where applications are installed.
-INSTALL_PATH := ./install
+INSTALL_PATH := $(abspath ./install)
 
 # Path to build files
 BLD := $(SOURCE_PATH)/bld
