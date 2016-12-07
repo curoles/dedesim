@@ -36,7 +36,7 @@ object Driver {
         def clockAction() = {
             val currentLevel = output.getSignal
             sim.afterDelay(period) {
-                sim.log(s"clock ${currentLevel} -> ${!currentLevel}")
+                //sim.log(s"clock ${currentLevel} -> ${!currentLevel}")
                 output setSignal !currentLevel
             }
         }
@@ -60,7 +60,7 @@ object Driver {
             val currentLevel = output.getSignal
             val period = if (currentLevel == true) hiPeriod else lowPeriod
             sim.afterDelay(period) {
-                sim.log(s"clock ${currentLevel} -> ${!currentLevel}")
+                //sim.log(s"clock ${currentLevel} -> ${!currentLevel}")
                 output setSignal !currentLevel
             }
         }

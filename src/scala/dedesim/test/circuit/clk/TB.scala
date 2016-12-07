@@ -52,6 +52,10 @@ class TB(parent: Component, name: String) extends Module(parent, name) {
     Driver.clock(period = 2, clk)
 
     val dut = new DUT(this, "DUT", clk)
+
+    monitor('level -> clk, 'fall -> reset) {
+        sim.log(s"clk=${clk.getSignalAsInt} reset=${reset.getSignalAsInt}")
+    }
 }
 
 

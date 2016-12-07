@@ -101,4 +101,20 @@ object Basic {
         (in1.wires, in2.wires, output.wires).zipped.foreach((i1,i2,o) => orGate(i1,i2,o))
     }
 
+
+    def monitor(components: Tuple2[Symbol,Trigger]*)(block: => Unit) = {
+        def monitorLevel() = {
+            sim.afterDelay(delay = 0)(block)
+        }
+        def addMonitorAction(c: Tuple2[Symbol,Trigger]) = {
+            val action: De.Action = c._1 match {
+                //case 'rise => monitorRise
+                //case 'fall => monitorFall
+                case _     => monitorLevel
+            }
+            c._2.addAction(action)
+        }
+        components foreach addMonitorAction
+    }
+
 }

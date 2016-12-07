@@ -40,11 +40,17 @@ class Simulation {
         }
     }
 
+    var finished = false
+
+    def finish() = this.finished = true
+
     def run(maxTime: Long = 10) = {
         afterDelay(0) { log("Simulation started!") }
 
-        while (!agenda.isEmpty && currentTime < maxTime) next()
+        while (!finished && !agenda.isEmpty && currentTime < maxTime) next()
     }
+
+
 }
 
 

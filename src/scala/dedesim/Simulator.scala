@@ -30,4 +30,11 @@ object Simulator {
 
         root.foreach(0, (level,name,x) => enable(x))
     }
+
+    /*Runtime.getRuntime().addShutdownHook(new Thread() {
+        public void run() {
+            my shutdown code here
+        }
+    });*/
+
 }

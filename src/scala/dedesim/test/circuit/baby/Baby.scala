@@ -9,6 +9,10 @@ import curoles.dedesim.Simulator.sim
 import curoles.dedesim.Driver._
 import curoles.dedesim.Basic._
 
+object Baby {
+    val OPCODE_WIDTH = 4
+}
+
 /** The Manchester Small-Scale Experimental Machine (SSEM), nicknamed Baby.
  *
  *  https://en.wikipedia.org/wiki/Manchester_Small-Scale_Experimental_Machine
@@ -24,14 +28,14 @@ class Baby(
 )
     extends Module(parent, name)
 {
-
+    //val OPCODE_WIDTH = 4
 }
 
 class TB(parent: Component, name: String) extends Module(parent, name) {
 
     sim.log("Test Bench \"Manchester Baby\"")
 
-    val WIDTH = 16
+    val WIDTH = Baby.OPCODE_WIDTH + 12
     //val DEPTH = 12
     //val STOP_OPCODE = 4'b0111
 
@@ -55,21 +59,17 @@ class TB(parent: Component, name: String) extends Module(parent, name) {
         ir = ir
     )
 
-    /*
-    sim.monitor(ir) {
-        if (ir[WIDTH-1:WIDTH-4] == STOP_OPCODE) {
+    monitor('level -> ir) {
+        /*if (ir[WIDTH-1:WIDTH-4] == STOP_OPCODE) {
             sim.log("STOP instruction executed, end of simulation")
             sim.finish
-        }
+        }*/
     }
-    */
 
-    /*
-    if (monitorEnable) { //rise, fall, level
-        sim.monitor('rise -> clk) { tuple(change: Symbol, comp: Component)
-            println()
+    //if (monitorEnabled) {
+        monitor('level -> clk, 'fall -> reset) {
+            sim.log(s"clk=${clk.getSignalAsInt} reset=${reset.getSignalAsInt}")
         }
-    }
-    */
+    //}
 }
 
