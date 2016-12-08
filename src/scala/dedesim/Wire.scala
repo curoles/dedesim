@@ -9,7 +9,7 @@ package curoles.dedesim
  *  changes it can trigger changes for other wires
  *  and Trigger objects. 
  */
-class Wire(parent: Component, name: String)
+class Wire(parent: Component, name: String, initVal: Int = 0)
     extends Component(parent, name, 'wire)
     with Trigger {
 
@@ -17,7 +17,7 @@ class Wire(parent: Component, name: String)
     type Level = Boolean
 
     /** Current value */
-    private var sigVal: Level = false
+    private var sigVal: Level = if (initVal == 0) false else true
 
     /** Get current value */
     def getSignal : Level = sigVal
@@ -51,40 +51,27 @@ class Wire(parent: Component, name: String)
 
 }
 
-class Wires(parent: Component, name: String, val width: Int)
+class Wires(parent: Component, name: String, val width: Int, initVal: Int = 0)
     extends Component(parent, name, 'wires)
     with Trigger
 {
     require(width > 0)
  
-    //val bits = new mutable.BitSet(width)
-
     val wires = new Array[Wire](width)
-    for { i <- wires.indices } wires(i) = new Wire(this, s"$i")
 
-    //def getSignal(bitNum: Int) = bits.contains(bitNum)
-    def getSignal(bitNum: Int) = wires(bitNum).getSignal
-
-    //def getSignalAsInt: Long = {
-    //    bits.toBitMask(0) //FIXME other Longs? or this method should return Array[Long]?
-    //}
-
-    def getSignalAsInt: Int = {
-        wires.zipWithIndex.foldLeft(0){ case(acc,(wire,i)) => acc + (wire.getSignalAsInt << i) }
+    for { i <- wires.indices } {
+        wires(i) = new Wire(this, s"$i", initVal & (1 << i))
     }
 
-    //def setSignal(bitNum: Int, newVal: Wire#Level) =
-    //    if (newVal) bits += bitNum else bits -= bitNum
-    def setSignal(bitNum: Int, newVal: Wire#Level) = wires(bitNum).setSignal(newVal)
+    def getSignal(bitNum: Int) = wires(bitNum).getSignal
 
-    /*def setSignal(newSigVal: Long) : Unit = {
-        if (newSigVal != sigVal) {
-            sigVal = newSigVal
-            changeEvent(sigVal)
-            act // trigger associated actions
+    def getSignalAsInt: Int = {
+        wires.zipWithIndex.foldLeft(0){
+           case(acc,(wire,i)) => acc + (wire.getSignalAsInt << i)
         }
-    }*/
+    }
 
+    def setSignal(bitNum: Int, newVal: Wire#Level) = wires(bitNum).setSignal(newVal)
 
 }
 

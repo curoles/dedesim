@@ -26,8 +26,8 @@ class Module(parent: Component, name: String)
         else subComponents.get.apply(name).asInstanceOf[Wire]
     }
 
-    def wires(name: String, width: Int): Wires = {
-        if (!subComponents.contains(name)) new Wires(this, name, width)
+    def wires(name: String, width: Int, initVal: Int = 0): Wires = {
+        if (!subComponents.contains(name)) new Wires(this, name, width, initVal)
         else subComponents.get.apply(name).asInstanceOf[Wires]
     }
 
