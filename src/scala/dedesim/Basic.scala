@@ -23,7 +23,7 @@ object Basic {
                output setSignal !inputSig
            }
         }
-        input addAction invertAction
+        input addAction (() => invertAction)
     }
 
     def inverter(input: Wires, output: Wires): Unit = {
@@ -39,7 +39,7 @@ object Basic {
                output setSignal inputSig
            }
         }
-        input addAction followAction
+        input addAction (() => followAction)
     }
 
     def follow(input: Wires, output: Wires): Unit = {
@@ -59,7 +59,7 @@ object Basic {
                }
            }
         }
-        clk addAction dffAction
+        clk addAction (() => dffAction)
     }
 
     def dff(clk: Wire, input: Wires, output: Wires): Unit = {
@@ -75,8 +75,8 @@ object Basic {
                 output setSignal (in1Sig & in2Sig)
             }
         }
-        in1 addAction andAction
-        in2 addAction andAction
+        in1 addAction (() => andAction)
+        in2 addAction (() => andAction)
     }
 
     def andGate(in1: Wires, in2: Wires, output: Wires): Unit = {
@@ -92,8 +92,8 @@ object Basic {
                 output setSignal (in1Sig & in2Sig)
             }
         }
-        in1 addAction orAction
-        in2 addAction orAction
+        in1 addAction (() => orAction)
+        in2 addAction (() => orAction)
     }
 
     def orGate(in1: Wires, in2: Wires, output: Wires): Unit = {
@@ -110,7 +110,7 @@ object Basic {
             val action: De.Action = c._1 match {
                 //case 'rise => monitorRise
                 //case 'fall => monitorFall
-                case _     => monitorLevel
+                case _     => (() => monitorLevel)
             }
             c._2.addAction(action)
         }

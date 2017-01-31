@@ -57,6 +57,6 @@ scala_doc: $(SCALA_SRCS)
 
 .PHONY: scala_test
 scala_test: classpath := "./build/scala/class:./build/scala/extralib/*"
-scala_test: run_scala_test := scala -cp $(classpath) org.scalatest.run
+scala_test: run_scala_test := $(SCALA) -cp $(classpath) org.scalatest.run
 scala_test:
 	$(run_scala_test) curoles.dedesim.TriggerSpec

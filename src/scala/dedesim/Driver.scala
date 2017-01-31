@@ -40,7 +40,7 @@ object Driver {
                 output setSignal !currentLevel
             }
         }
-        output addAction clockAction
+        output.addAction(() => clockAction())
     }
 
     /** Generates periodic asymmetrical clock signal.
@@ -64,7 +64,7 @@ object Driver {
                 output setSignal !currentLevel
             }
         }
-        output addAction clockAction
+        output addAction (() => clockAction)
     }
 
 }

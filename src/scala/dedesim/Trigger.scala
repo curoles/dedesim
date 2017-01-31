@@ -51,9 +51,9 @@ class TriggerSpec extends FlatSpec {
     def incr() = count += 1
 
     it should "have as many actions as we added" in {
-        t.addAction(incr)
+        t.addAction(() => incr)
         assert(count == 1)
-        t.addAction(incr)
+        t.addAction(() => incr)
         assert(count == 2 && t.numActions == 2)
         t.act
         assert(count == 4)
