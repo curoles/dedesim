@@ -53,7 +53,8 @@ install_jars: $(INSTALL_PATH)/dedesim.jar $(INSTALL_PATH)/dedesim_test_circuits.
 	cp $(SCALA_EXTRA_LIB_DIR)/*.jar $(INSTALL_PATH)/.
 
 $(INSTALL_PATH)/dedesim: $(BLD)/dedesim.bash
-	cp $(BLD)/dedesim.bash $@
+#	cp $(BLD)/dedesim.bash $@
+	sed -e 's#scala#$(SCALA)#g' $(BLD)/dedesim.bash > $@
 	chmod a+x $@
 
 .PHONY: install_scripts
