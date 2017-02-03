@@ -37,7 +37,7 @@ $(SCALA_CLASS_DIR):
 $(SCALA_EXTRA_LIB_DIR):
 	mkdir -p $(SCALA_EXTRA_LIB_DIR)
 
-SCALATEST_VER := 2.12-3.0.0
+SCALATEST_VER := $(SCALA_MAJOR_VER)-3.0.1
 
 .PHONY: scala_extra_libs
 scala_extra_libs: $(SCALA_EXTRA_LIB_DIR)/scalatest_$(SCALATEST_VER).jar
@@ -45,11 +45,11 @@ scala_extra_libs: $(SCALA_EXTRA_LIB_DIR)/scalactic_$(SCALATEST_VER).jar
 
 $(SCALA_EXTRA_LIB_DIR)/scalatest_$(SCALATEST_VER).jar:
 	@mkdir -p $(SCALA_EXTRA_LIB_DIR)
-	wget -P $(SCALA_EXTRA_LIB_DIR) https://oss.sonatype.org/content/groups/public/org/scalatest/scalatest_2.12/3.0.0/scalatest_$(SCALATEST_VER).jar
+	wget -P $(SCALA_EXTRA_LIB_DIR) https://oss.sonatype.org/content/groups/public/org/scalatest/scalatest_$(SCALA_MAJOR_VER)/3.0.1/scalatest_$(SCALATEST_VER).jar
 
 $(SCALA_EXTRA_LIB_DIR)/scalactic_$(SCALATEST_VER).jar:
 	@mkdir -p $(SCALA_EXTRA_LIB_DIR)
-	wget -P $(SCALA_EXTRA_LIB_DIR) https://oss.sonatype.org/content/groups/public/org/scalactic/scalactic_2.12/3.0.0/scalactic_$(SCALATEST_VER).jar
+	wget -P $(SCALA_EXTRA_LIB_DIR) https://oss.sonatype.org/content/groups/public/org/scalactic/scalactic_$(SCALA_MAJOR_VER)/3.0.1/scalactic_$(SCALATEST_VER).jar
 
 .PHONY: scala_doc
 scala_doc: SCALAC_FLAGS := -cp "$(SCALA_EXTRA_LIB_DIR)/*"
