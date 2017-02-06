@@ -57,3 +57,18 @@ To generate documentation:
 ```
 > make doc
 ```
+
+## Scala syntax in VIM
+
+See instructions at https://github.com/derekwyatt/vim-scala
+
+Recipe:
+```
+> mkdir -p ~/.vim/autoload ~/.vim/bundle && curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
+> ls ~/.vim/autoload/
+omni  pathogen.vim
+> mkdir -p ~/.vim/{ftdetect,indent,syntax} && for d in ftdetect indent syntax ; do curl -o ~/.vim/$d/scala.vim https://raw.githubusercontent.com/derekwyatt/vim-scala/master/$d/scala.vim; done
+> ls ~/.vim/syntax/
+scala.vim  systemverilog.vim
+```
+
