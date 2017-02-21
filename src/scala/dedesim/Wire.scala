@@ -73,5 +73,12 @@ class Wires(parent: Component, name: String, val width: Int, initVal: Int = 0)
 
     def setSignal(bitNum: Int, newVal: Wire#Level) = wires(bitNum).setSignal(newVal)
 
+    def setSignalAsInt(n: Int): Unit = {
+        for { bitIndex <- wires.indices } {
+            val bitVal =  (n & (1 << bitIndex)) != 0
+            setSignal(bitIndex, bitVal)
+        }
+println(name + "************ set to " + getSignalAsInt.toString)
+    }
 }
 

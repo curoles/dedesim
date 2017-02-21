@@ -44,8 +44,11 @@ class Simulation {
 
     def finish() = this.finished = true
 
-    def run(maxTime: Long = 10) = {
-        afterDelay(0) { log("Simulation started!") }
+    def run(period: Long = 10) = {
+        val maxTime = currentTime + period
+
+        log("Simulation started!")
+        if (agenda.isEmpty )log("WARNING: Agenda is empty, nothing to simulate!")
 
         while (!finished && !agenda.isEmpty && currentTime < maxTime) next()
     }
