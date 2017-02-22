@@ -16,7 +16,8 @@ SCALA_SRCs += dedesim/Module.scala dedesim/RootModule.scala
 SCALA_SRCs += dedesim/Messenger.scala
 SCALA_SRCs += dedesim/Simulation.scala dedesim/Simulator.scala
 SCALA_SRCs += dedesim/Driver.scala dedesim/Basic.scala
-SCALA_SRCs += dedesim/hwlib/AddrDecoder.scala
+SCALA_SRCs += dedesim/hwlib/Word.scala
+SCALA_SRCs += dedesim/hwlib/AddrDecoder.scala dedesim/hwlib/Sram.scala
 SCALA_SRCs += dedesim/VCDumper.scala
 SCALA_SRCs += dedesim/SimRunner.scala
 

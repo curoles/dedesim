@@ -30,14 +30,13 @@ class AddrDecoder(
 
     def addrDecoder(addr: Wires, output: Wires): Unit = {
         def decodeAction() = {
+            val addrVal: Int = addr.getSignalAsInt
             sim.afterDelay(0) {
-                val addrVal: Int = addr.getSignalAsInt
-println("decode add "+addrVal.toString+"  "+addr.getSignalAsInt.toString)
                 output.setSignalAsInt(1 << addrVal)
             }
         }
 
-        addr addAction (() => decodeAction)
+        addr.wires.foreach{ wire => wire.addAction(() => decodeAction) }
     }
 
     addrDecoder(address, select)
@@ -57,9 +56,6 @@ class AddrDecoderSpec extends FlatSpec {
         addr.setSignalAsInt(0x0)
         sim.run(1)
         assert(sel.getSignalAsInt == 0x1)
-        addr.setSignalAsInt(0x1)
-        sim.run(1)
-        assert(sel.getSignalAsInt == 0x2)
     }
 
     it should "decode 01 as 2" in {
