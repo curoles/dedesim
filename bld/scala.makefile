@@ -65,3 +65,5 @@ scala_test: run_scala_test := $(SCALA) -cp $(classpath) org.scalatest.run
 scala_test:
 	$(run_scala_test) curoles.dedesim.TriggerSpec
 	$(run_scala_test) curoles.dedesim.hwlib.AddrDecoderSpec
+	$(run_scala_test) curoles.dedesim.hwlib.WordSpec
+	$(run_scala_test) curoles.dedesim.hwlib.SramSpec

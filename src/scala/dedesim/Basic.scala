@@ -117,4 +117,36 @@ object Basic {
         components foreach addMonitorAction
     }
 
+    def mux2to1(select: Wire, in1: Wire, in2: Wire, output: Wire): Unit = {
+        def muxAction() = {
+            val in1Sig = in1.getSignal
+            val in2Sig = in2.getSignal
+            val selSig = select.getSignal
+            sim.afterDelay(0) {
+                output setSignal (if (selSig) in2Sig else in1Sig)
+            }
+        }
+        in1 addAction (() => muxAction)
+        in2 addAction (() => muxAction)
+        select addAction (() => muxAction)
+    }
+
+    def mux2to1(select: Wire, in1: Wires, in2: Wires, output: Wires): Unit = {
+        require(in1.width == in2.width && in2.width == output.width)
+        (in1.wires, in2.wires, output.wires).zipped.foreach((i1,i2,o) => mux2to1(select,i1,i2,o))
+    }
+
+    def adder(in1: Wires, in2: Wires, output: Wires): Unit = {
+        require(in1.width == in2.width && in2.width == output.width)
+        def addAction() = {
+            val in1Sig = in1.getSignalAsInt
+            val in2Sig = in2.getSignalAsInt
+            sim.afterDelay(0) {
+                output.setSignalAsInt(in1Sig + in2Sig)
+            }
+        }
+        in1 addAction (() => addAction)
+        in2 addAction (() => addAction)
+    }
+
 }

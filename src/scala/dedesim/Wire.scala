@@ -71,7 +71,12 @@ class Wires(parent: Component, name: String, val width: Int, initVal: Int = 0)
         }
     }
 
-    def setSignal(bitNum: Int, newVal: Wire#Level) = wires(bitNum).setSignal(newVal)
+    def setSignal(bitNum: Int, newVal: Wire#Level) = {
+        if (wires(bitNum).getSignal != newVal) {
+            wires(bitNum).setSignal(newVal)
+            act // trigger associated actions
+        }
+    }
 
     def setSignalAsInt(n: Int): Unit = {
         for { bitIndex <- wires.indices } {

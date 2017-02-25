@@ -9,11 +9,14 @@ import curoles.dedesim.Simulator.sim
 import curoles.dedesim.Driver._
 import curoles.dedesim.Basic._
 import curoles.dedesim.util.StringUtils._
+import curoles.dedesim.hwlib.Sram1R1W
 
 object Baby {
     val OPCODE_WIDTH = 4
     val DATA_WIDTH = 4
     val WORD_WIDTH = OPCODE_WIDTH + DATA_WIDTH
+    val ADDR_WIDTH = 12
+    val ADDR_SIZE  = 1 << 12
 }
 
 /** The Manchester Small-Scale Experimental Machine (SSEM), nicknamed Baby.
@@ -31,12 +34,44 @@ class Baby(
 )
     extends Module(parent, name)
 {
+    val readAddr = wires("readAddr", Baby.ADDR_WIDTH)
+    val writeAddr = wires("writeAddr", Baby.ADDR_WIDTH)
+    val readData = wires("readData", Baby.WORD_WIDTH)
+    val writeData = wires("writeData", Baby.WORD_WIDTH)
+    val writeEnable = wire("writeEnable")
+
+    val mem = new Sram1R1W(
+        this,
+        "mem",
+        Baby.WORD_WIDTH,
+        Baby.ADDR_SIZE,
+        clk,
+        readAddr,
+        readData,
+        writeEnable,
+        writeAddr,
+        writeData
+    )
+
+    val zero_addr = wires("zero_addr", Baby.ADDR_WIDTH, 0)
+    val zero_word = wires("zero_word", Baby.WORD_WIDTH, 0)
+
+    val pc = wires("pc", Baby.ADDR_WIDTH)
+    val new_pc = wires("new_pc", Baby.ADDR_WIDTH)
+    dff(clk, input = new_pc, output = pc)
+
+    val next_pc = wires("next_pc", Baby.ADDR_WIDTH)
+    val addr_1 = wires("addr_1", Baby.ADDR_WIDTH, 1)
+    mux2to1(select = reset, in2 = zero_addr, in1 = next_pc, output = new_pc)
+    adder(output = next_pc, in1 = pc, in2 = addr_1)
+
+    monitor('level -> pc, 'level -> next_pc, 'level -> new_pc, 'level -> clk) {
+        sim.log(s"pc=${pc.getSignalAsInt} next_pc=${next_pc.getSignalAsInt} new_pc=${new_pc.getSignalAsInt}")
+    }
+
     val LDA = b"0000"
 
-    val pc = wires("pc", Baby.WORD_WIDTH)
-    val zero = wires("zero", Baby.WORD_WIDTH, 0)
  
-    dff(clk, input = zero, output = pc)
     //dff(clk, input = zero, output = ir)
     //dff(clk, input = zero, output = acc)
 
