@@ -65,23 +65,23 @@ class Wires(parent: Component, name: String, val width: Int, initVal: Int = 0)
 
     def getSignal(bitNum: Int) = wires(bitNum).getSignal
 
-    def getSignalAsInt: Int = {
+    def getSignalAsInt: Long = {
         wires.zipWithIndex.foldLeft(0){
            case(acc,(wire,i)) => acc + (wire.getSignalAsInt << i)
         }
     }
 
     def setSignal(bitNum: Int, newVal: Wire#Level) = {
-        if (wires(bitNum).getSignal != newVal) {
-            wires(bitNum).setSignal(newVal)
-            act // trigger associated actions
-        }
+        wires(bitNum).setSignal(newVal)
     }
 
-    def setSignalAsInt(n: Int): Unit = {
-        for { bitIndex <- wires.indices } {
-            val bitVal =  (n & (1 << bitIndex)) != 0
-            setSignal(bitIndex, bitVal)
+    def setSignalAsInt(n: Long): Unit = {
+        if (n != getSignalAsInt) {
+            for { bitIndex <- wires.indices } {
+                val bitVal = (n & (1 << bitIndex)) != 0
+                setSignal(bitIndex, bitVal)
+            }
+            act // trigger associated actions
         }
         //println(name + " set to " + getSignalAsInt.toString)
     }

@@ -21,8 +21,8 @@ class Module(parent: Component, name: String)
      * 
      *  Note that new Wire(this,...) adds itself to this.subComponents
      */
-    def wire(name: String): Wire = {
-        if (!subComponents.contains(name)) new Wire(this, name)
+    def wire(name: String, initVal: Int = 0): Wire = {
+        if (!subComponents.contains(name)) new Wire(this, name, initVal)
         else subComponents.get.apply(name).asInstanceOf[Wire]
     }
 

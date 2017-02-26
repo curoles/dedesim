@@ -8,7 +8,7 @@ BABY_TEST1 := \
     println(\"Baby one\"); \
     val vcd = new VCD(\"wave.vcd\"); \
     simulator.enableWireEvent(); \
-    sim.run(40); \
+    sim.run(100); \
     vcd.close();
 
 .PHONY: test

@@ -30,7 +30,7 @@ class AddrDecoder(
 
     def addrDecoder(addr: Wires, output: Wires): Unit = {
         def decodeAction() = {
-            val addrVal: Int = addr.getSignalAsInt
+            val addrVal: Int = addr.getSignalAsInt.toInt
             sim.afterDelay(0) {
                 output.setSignalAsInt(1 << addrVal)
             }

@@ -50,8 +50,8 @@ object Basic {
     def dff(clk: Wire, input: Wire, output: Wire): Unit = {
         val ff = new FlipFlop(null, "ff")
         def dffAction() = {
-           val rising = clk.getSignal == true
-           if (rising) {
+           val posedgeClk = clk.getSignal == true
+           if (posedgeClk) {
                val inputSig = input.getSignal
                sim.afterDelay(0) {
                    ff.setSignal(inputSig)
@@ -138,15 +138,84 @@ object Basic {
 
     def adder(in1: Wires, in2: Wires, output: Wires): Unit = {
         require(in1.width == in2.width && in2.width == output.width)
-        def addAction() = {
+        def adderAction() = {
             val in1Sig = in1.getSignalAsInt
             val in2Sig = in2.getSignalAsInt
             sim.afterDelay(0) {
                 output.setSignalAsInt(in1Sig + in2Sig)
             }
         }
-        in1 addAction (() => addAction)
-        in2 addAction (() => addAction)
+        in1.wires.foreach(wire => wire.addAction(() => adderAction))
+        in2.wires.foreach(wire => wire.addAction(() => adderAction))
+    }
+
+}
+
+import org.scalatest.FlatSpec
+
+class BasicGatesSpec extends FlatSpec {
+
+    def clock(period: Int, output: Wire) {
+        def clockAction() = {
+            val currentLevel = output.getSignal
+            sim.afterDelay(period) {
+                output setSignal !currentLevel
+            }
+        }
+        output.addAction(() => clockAction())
+    }
+
+    it should "mux2to1 outputs in1 when sel is 0 and in2 when sel is 1" in {
+        val in1 = new Wires(null, "in1", 32, 0x123)
+        val in2 = new Wires(null, "in2", 32, 0x456)
+        val out = new Wires(null, "out", 32)
+        val sel = new Wire(null, "sel")
+        Basic.mux2to1(output=out, select = sel, in1 = in1, in2 = in2)
+        sim.run(1)
+        assert(out.getSignalAsInt == 0x123)
+        sel.setSignal(true)
+        sim.run(1)
+        assert(out.getSignalAsInt == 0x456)
+    }
+
+    it should "adder calculates sum of two numbers" in {
+        val in1 = new Wires(null, "in1", 32, 3)
+        val in2 = new Wires(null, "in2", 32, 4)
+        val sum = new Wires(null, "sum", 32)
+        Basic.adder(output=sum, in1 = in1, in2 = in2)
+        sim.run(1)
+        assert(sum.getSignalAsInt == (3+4))
+        in1.setSignalAsInt(7)
+        sim.run(1)
+        assert(sum.getSignalAsInt == (7+4))
+    }
+
+    it should "DFF delays input by one clock" in {
+        val clk = new Wire(null, "clk")
+        clock(period = 1, clk)
+        val in1 = new Wires(null, "in1", 3, 0)
+        val in2 = new Wires(null, "in2", 3, 1)
+        val sum = new Wires(null, "sum", 3)
+        Basic.adder(output=sum, in1 = in1, in2 = in2)
+        Basic.dff(clk = clk, input = sum, output = in1)
+        sim.run(1) // LO
+        assert(in1.getSignalAsInt == 0)
+        assert(sum.getSignalAsInt == (0+1))
+        sim.run(1) // HI
+        assert(in1.getSignalAsInt == 0)
+        assert(sum.getSignalAsInt == (0+1))
+        sim.run(1) // LO
+        assert(in1.getSignalAsInt == 0)
+        assert(sum.getSignalAsInt == (0+1))
+        sim.run(1) // HI
+        assert(in1.getSignalAsInt == 1)
+        assert(sum.getSignalAsInt == (1+1))
+        sim.run(1) // LO
+        assert(in1.getSignalAsInt == 1)
+        assert(sum.getSignalAsInt == (1+1))
+        sim.run(10)
+        assert(in1.getSignalAsInt == 3) //1,2:1; 3,4:2; 5,6:2; 7,8:3; 9,10:3
+        assert(sum.getSignalAsInt == (3+1))
     }
 
 }

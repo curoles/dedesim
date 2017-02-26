@@ -40,7 +40,7 @@ class Sram1R1W(
 
     def implementRead(addr: Wires, rdData: Wires): Unit = {
         def readAction() = {
-            val addrVal: Int = addr.getSignalAsInt
+            val addrVal: Int = addr.getSignalAsInt.toInt
             sim.afterDelay(0) {
                 for (pos <- 0 until wordWidth) {
                     //sim.log(s"SRAM ${name} read at address ${addrVal} bit ${pos}")
@@ -57,7 +57,7 @@ class Sram1R1W(
         def writeAction() = {
             val posedgeClk = clk.getSignal == true
             if (posedgeClk && writeEnable.getSignal) {
-                val addrVal: Int = addr.getSignalAsInt
+                val addrVal: Int = addr.getSignalAsInt.toInt
                 sim.afterDelay(0) {
                     for (pos <- 0 until wordWidth) {
                         data(addrVal).setBit(pos, wrData.getSignal(pos))

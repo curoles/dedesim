@@ -65,7 +65,7 @@ class Baby(
     mux2to1(select = reset, in2 = zero_addr, in1 = next_pc, output = new_pc)
     adder(output = next_pc, in1 = pc, in2 = addr_1)
 
-    monitor('level -> pc, 'level -> next_pc, 'level -> new_pc, 'level -> clk) {
+    monitor('level -> pc, 'level -> next_pc, 'level -> new_pc) {
         sim.log(s"pc=${pc.getSignalAsInt} next_pc=${next_pc.getSignalAsInt} new_pc=${new_pc.getSignalAsInt}")
     }
 
@@ -138,13 +138,14 @@ class TB(parent: Component, name: String) extends Module(parent, name) {
     //val DEPTH = 12
     //val STOP_OPCODE = 4'b0111
 
-    val clk = wire("clk")
+    val clk = wire("clk", 1)
     val reset = wire("reset")
 
-    clock(period = 2, clk) // Clock generator.
+    // Clock generator
+    clock(period = 5, clk) // 5 low and 5 high ticks, 10 ticks between posedges.
 
     drive('HI, reset, 0) // Initially reset is HI,
-    drive('LO, reset, 3) // then it goes LOW.
+    drive('LO, reset, 15) // then it goes LOW.
 
     //val pc = wires("pc")
     val ir = wires("ir", WIDTH)
