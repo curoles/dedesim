@@ -81,9 +81,13 @@ class Wires(parent: Component, name: String, val width: Int, initVal: Int = 0)
                 val bitVal = (n & (1 << bitIndex)) != 0
                 setSignal(bitIndex, bitVal)
             }
-            act // trigger associated actions
         }
-        //println(name + " set to " + getSignalAsInt.toString)
     }
+
+    override def addAction(a: De.Action) = {
+        super.addAction(a)
+        wires.foreach(wire => wire.addAction(a))
+    }
+
 }
 

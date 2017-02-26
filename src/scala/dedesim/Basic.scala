@@ -48,14 +48,12 @@ object Basic {
     }
 
     def dff(clk: Wire, input: Wire, output: Wire): Unit = {
-        val ff = new FlipFlop(null, "ff")
         def dffAction() = {
            val posedgeClk = clk.getSignal == true
            if (posedgeClk) {
                val inputSig = input.getSignal
                sim.afterDelay(0) {
-                   ff.setSignal(inputSig)
-                   output setSignal ff.getSignal
+                   output setSignal inputSig
                }
            }
         }
@@ -193,29 +191,29 @@ class BasicGatesSpec extends FlatSpec {
     it should "DFF delays input by one clock" in {
         val clk = new Wire(null, "clk")
         clock(period = 1, clk)
-        val in1 = new Wires(null, "in1", 3, 0)
-        val in2 = new Wires(null, "in2", 3, 1)
-        val sum = new Wires(null, "sum", 3)
+        val in1 = new Wires(null, "in1", 4, 0)
+        val in2 = new Wires(null, "in2", 4, 1)
+        val sum = new Wires(null, "sum", 4)
         Basic.adder(output=sum, in1 = in1, in2 = in2)
         Basic.dff(clk = clk, input = sum, output = in1)
         sim.run(1) // LO
         assert(in1.getSignalAsInt == 0)
         assert(sum.getSignalAsInt == (0+1))
         sim.run(1) // HI
-        assert(in1.getSignalAsInt == 0)
-        assert(sum.getSignalAsInt == (0+1))
+        assert(in1.getSignalAsInt == 1)
+        assert(sum.getSignalAsInt == (1+1))
         sim.run(1) // LO
-        assert(in1.getSignalAsInt == 0)
-        assert(sum.getSignalAsInt == (0+1))
+        assert(in1.getSignalAsInt == 1)
+        assert(sum.getSignalAsInt == (1+1))
         sim.run(1) // HI
-        assert(in1.getSignalAsInt == 1)
-        assert(sum.getSignalAsInt == (1+1))
+        assert(in1.getSignalAsInt == 2)
+        assert(sum.getSignalAsInt == (2+1))
         sim.run(1) // LO
-        assert(in1.getSignalAsInt == 1)
-        assert(sum.getSignalAsInt == (1+1))
+        assert(in1.getSignalAsInt == 2)
+        assert(sum.getSignalAsInt == (2+1))
         sim.run(10)
-        assert(in1.getSignalAsInt == 3) //1,2:1; 3,4:2; 5,6:2; 7,8:3; 9,10:3
-        assert(sum.getSignalAsInt == (3+1))
+        assert(in1.getSignalAsInt == 7) //1,2:3; 3,4:4; 5,6:5; 7,8:6; 9,10:7
+        assert(sum.getSignalAsInt == (7+1))
     }
 
 }

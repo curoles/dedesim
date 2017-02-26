@@ -65,8 +65,22 @@ class Baby(
     mux2to1(select = reset, in2 = zero_addr, in1 = next_pc, output = new_pc)
     adder(output = next_pc, in1 = pc, in2 = addr_1)
 
-    monitor('level -> pc, 'level -> next_pc, 'level -> new_pc) {
-        sim.log(s"pc=${pc.getSignalAsInt} next_pc=${next_pc.getSignalAsInt} new_pc=${new_pc.getSignalAsInt}")
+    monitor('level -> pc/*, 'level -> next_pc, 'level -> new_pc*/) {
+        //sim.log(s"pc=${pc.getSignalAsInt} next_pc=${next_pc.getSignalAsInt} new_pc=${new_pc.getSignalAsInt}")
+        sim.log(s"pc=${pc.getSignalAsInt}")
+    }
+
+
+    follow(output = readAddr, input = pc)
+    val new_ir = wires("new_ir", Baby.WORD_WIDTH)
+    //val next_ir = wires("next_ir", Baby.WORD_WIDTH)
+    val next_ir = readData
+
+    mux2to1(select = reset, in2 = zero_word, in1 = next_ir, output = new_ir)
+    dff(clk, input = new_ir, output = ir)
+
+    monitor('level -> ir) {
+        sim.log(s"ir=${ir.getSignalAsInt}")
     }
 
     val LDA = b"0000"
