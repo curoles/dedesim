@@ -11,6 +11,8 @@ ifeq ($(HOSTNAME), pc104.smi.local)
   SCALA:=JAVA_HOME=$(JAVA_HOME) $(SCALA_HOME)/bin/scala
   SCALAC:=JAVA_HOME=$(JAVA_HOME) $(SCALA_HOME)/bin/scalac
   FASTSCALAC:=JAVA_HOME=$(JAVA_HOME) $(SCALA_HOME)/bin/fsc
+  SCALADOC:=JAVA_HOME=$(JAVA_HOME) $(SCALA_HOME)/bin/scaladoc
+  DOXYGEN:=/tools/local/doxygen-1.8.11/bin/doxygen
 else
 
 endif 

@@ -57,7 +57,7 @@ $(SCALA_EXTRA_LIB_DIR)/scalactic_$(SCALATEST_VER).jar:
 scala_doc: SCALAC_FLAGS := -cp "$(SCALA_EXTRA_LIB_DIR)/*"
 scala_doc: $(SCALA_SRCS)
 	mkdir -p ./build/doc/scala
-	scaladoc -d ./build/doc/scala $(SCALAC_FLAGS) $(SCALA_SRCS)
+	$(SCALADOC) -d ./build/doc/scala $(SCALAC_FLAGS) $(SCALA_SRCS)
 
 .PHONY: scala_test
 scala_test: classpath := "./build/scala/class:./build/scala/extralib/*"
