@@ -13,6 +13,7 @@ ifeq ($(HOSTNAME), pc104.smi.local)
   FASTSCALAC:=JAVA_HOME=$(JAVA_HOME) $(SCALA_HOME)/bin/fsc
   SCALADOC:=JAVA_HOME=$(JAVA_HOME) $(SCALA_HOME)/bin/scaladoc
   DOXYGEN:=/tools/local/doxygen-1.8.11/bin/doxygen
+  DITAA:=/local_disk/igor/tools/ditaa/ditaa
 else
-
+ #/home/igor/tool/ditaa/ditaa
 endif 

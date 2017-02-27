@@ -134,6 +134,37 @@ object Basic {
         (in1.wires, in2.wires, output.wires).zipped.foreach((i1,i2,o) => mux2to1(select,i1,i2,o))
     }
 
+    /** Register as a storage.
+     *
+     *  @param read reads stored value
+     *  @param write new value to store
+     *
+     *  <hr>
+     *  <pre class="textdiagram">
+     *       +----------------------+
+     *       |                      |
+     *       |  +----+    +----+    |
+     *       |  |Mux |    |DFF |    |
+     *  read +->| 0  |    |    |    |  read
+     *          |    +--->|    +----+--->
+     *    +---->| 1  |    |    |
+     *  write   +-+--+    +--+-+
+     *            |          |
+     *            +          +
+     *         write_en     clk
+     *  </pre>
+     */
+    def register(clk: Wire, read: Wire, write: Wire, write_en: Wire): Unit = {
+        val new_reg_val = new Wire(null, "new_reg_val")
+        mux2to1(select = write_en, in1 = read, in2 = write, output = new_reg_val)
+        dff(clk = clk, input = new_reg_val, output = read)
+    }
+
+    def register(clk: Wire, read: Wires, write: Wires, write_en: Wire): Unit = {
+        require(read.width == write.width)
+        (read.wires, write.wires).zipped.foreach((r,w) => register(clk, r, w, write_en))
+    }
+
     def adder(in1: Wires, in2: Wires, output: Wires): Unit = {
         require(in1.width == in2.width && in2.width == output.width)
         def adderAction() = {

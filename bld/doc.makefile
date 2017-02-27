@@ -13,7 +13,7 @@ $(MAIN_DOCS_BUILD_DIR):
 doc: main_doc scala_doc
 
 .PHONY: doc_ditaa
-doc_ditaa: DITAA := /home/igor/tool/ditaa/ditaa
+doc_ditaa: DITAA := $(DITAA)
 doc_ditaa: HTML_FILES = $(shell find $(abspath $(DOCS_BUILD_DIR)) -type f -name '*.html')
 doc_ditaa: FILES_WITH_DIAGRAMS = $(shell grep -l textdiagram $(HTML_FILES))
 doc_ditaa: doc

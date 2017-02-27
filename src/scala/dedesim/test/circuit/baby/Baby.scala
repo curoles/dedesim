@@ -143,31 +143,51 @@ module mu0 (clk, reset, pc, ir, acc);
            end
     endcase
 end
-*/    monitor('level -> pc/*, 'level -> next_pc, 'level -> new_pc*/) {
-        //sim.log(s"pc=${pc.getSignalAsInt} next_pc=${next_pc.getSignalAsInt} new_pc=${new_pc.getSignalAsInt}")
-        sim.log(s"pc=${pc.getSignalAsInt}")
-    }
+*/
 
+    val acc = wires("acc", Baby.WORD_WIDTH)
+    val acc_write = wires("acc_write", Baby.WORD_WIDTH)
+    val acc_write_en = wire("acc_write_en")
+
+    val regFile = new RegFile(
+        parent = this,
+        name = "regFile",
+        clk = clk,
+        reset = reset,
+        acc_read = acc,
+        acc_write = acc_write,
+        acc_write_en = acc_write_en
+    )
+
+    /** Register File has only one register called "acc(umulator)"
+     *
+     */
+    class RegFile(
+        parent: Component,
+        name: String,
+        clk: Wire,
+        reset: Wire,
+        acc_read: Wires,
+        acc_write: Wires,
+        acc_write_en: Wire
+    )
+        extends Module(parent, name)
+    {
+        register(clk = clk, read = acc_read, write = acc_write, write_en = acc_write_en)
+    }
 
     def loadProgram(mem: Sram1R1W): Unit = {
 
         //https://github.com/nkkav/mu0/blob/master/sim/archc/test/test1.hex
-        //.text:
-        //0000 0008
-        //0002 200a
-        //0004 100c
-        //0006 7000
-        //.data:
-        //0008 000a
-        //000a 0001
-        //000c 0000
-        mem.data(0).fromInteger(0x0008)
-        mem.data(1).fromInteger(0x200a)
-        mem.data(2).fromInteger(0x100c)
-        mem.data(3).fromInteger(0x7000)
-        mem.data(4).fromInteger(0x000a)
-        mem.data(5).fromInteger(0x0001)
-        mem.data(6).fromInteger(0x0000)
+                                        //.text:
+        mem.data(0).fromInteger(0x0008) //0000 0008 
+        mem.data(1).fromInteger(0x200a) //0002 200a
+        mem.data(2).fromInteger(0x100c) //0004 100c
+        mem.data(3).fromInteger(0x7000) //0006 7000
+                                        //.data:
+        mem.data(4).fromInteger(0x000a) //0008 000a
+        mem.data(5).fromInteger(0x0001) //000a 0001
+        mem.data(6).fromInteger(0x0000) //000c 0000
     }
 }
 
