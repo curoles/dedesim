@@ -85,7 +85,7 @@ class Baby(
         sim.log(s"ir=${ir.getSignalAsInt}")
     }
 
-    val LDA = b"0000"
+    //val LDA = b"0000"
 
  
     //dff(clk, input = zero, output = ir)
@@ -159,6 +159,14 @@ end
         acc_write_en = acc_write_en
     )
 
+    val executer = new Executer(
+        parent = this,
+        name = "executer",
+        clk = clk,
+        reset = reset,
+        ir = ir
+    )
+
     /** Register File has only one register called "acc(umulator)"
      *
      */
@@ -176,14 +184,111 @@ end
         register(clk = clk, read = acc_read, write = acc_write, write_en = acc_write_en)
     }
 
+    /** Instruction Execution Unit.
+     *
+     *  {{{
+     *  case (opcode)
+     *    LDA: acc = mem[address];
+     *    STO: mem[address] = acc;
+     *    ADD: acc = acc + mem[address];
+     *    SUB: acc = acc - mem[address];
+     *    JMP: pc = address;
+     *    JGE: if (acc[MAXWIDTH-1] == 1'b0) begin
+     *           pc = address;
+     *         end
+     *    JNE: if (acc != 0) begin
+     *           pc = address;
+     *         end
+     *    STP: pc = pc;
+     *    default: begin
+     *  }}}
+     */
+    class Executer(
+        parent: Component,
+        name: String,
+        clk: Wire,
+        reset: Wire,
+        ir: Wires
+    )
+        extends Module(parent, name)
+    {
+        val isLDA = wire("isLDA")
+        val isSTO = wire("isSTO")
+        val isADD = wire("isADD")
+        val isSUB = wire("isSUB")
+        val isJMP = wire("isJMP")
+        val isJGE = wire("isJGE")
+        val isJNE = wire("isJNE")
+        val isSTP = wire("isSTP")
+
+        val decoder = new Decoder(
+            parent = this,
+            name = "decoder",
+            clk = clk,
+            reset = reset,
+            opcode = wires("FIXME",4,0x1),
+            isLDA = isLDA,
+            isSTO = isSTO,
+            isADD = isADD,
+            isSUB = isSUB,
+            isJMP = isJMP,
+            isJGE = isJGE,
+            isJNE = isJNE,
+            isSTP = isSTP
+        )
+        //val isAccWrite = wire("isAccWrite")
+        //or3(output = isAccWrite, isLDA, isADD, isSUB)
+    }
+
+    /** Decoder.
+     *
+     */
+    class Decoder(
+        parent: Component,
+        name: String,
+        clk: Wire,
+        reset: Wire,
+        opcode: Wires,
+        isLDA: Wire, // 4'b0000
+        isSTO: Wire, // 4'b0001
+        isADD: Wire, // 4'b0010
+        isSUB: Wire, // 4'b0011
+        isJMP: Wire, // 4'b0100
+        isJGE: Wire, // 4'b0101
+        isJNE: Wire, // 4'b0110
+        isSTP: Wire  // 4'b0111
+    )
+        extends Module(parent, name)
+    {
+        require(opcode.width == Baby.OPCODE_WIDTH)
+        val opcodeN = wires("opcodeN", Baby.OPCODE_WIDTH)
+        inverter(input = opcode, output = opcodeN)
+
+        andGate(output = isLDA, opcodeN.wires(3), opcodeN.wires(2), opcodeN.wires(1), opcodeN.wires(0))
+        andGate(output = isSTO, opcodeN.wires(3), opcodeN.wires(2), opcodeN.wires(1),  opcode.wires(0))
+        andGate(output = isADD, opcodeN.wires(3), opcodeN.wires(2),  opcode.wires(1), opcodeN.wires(0))
+        andGate(output = isSUB, opcodeN.wires(3), opcodeN.wires(2),  opcode.wires(1),  opcode.wires(0))
+        andGate(output = isJMP, opcodeN.wires(3),  opcode.wires(2), opcodeN.wires(1), opcodeN.wires(0))
+        andGate(output = isJGE, opcodeN.wires(3),  opcode.wires(2), opcodeN.wires(1),  opcode.wires(0))
+        andGate(output = isJNE, opcodeN.wires(3),  opcode.wires(2),  opcode.wires(1), opcodeN.wires(0))
+        andGate(output = isSTP, opcodeN.wires(3),  opcode.wires(2),  opcode.wires(1),  opcode.wires(0))
+
+        sim.log(s"OPCODE=${opcode.getSignalAsInt} LDA:${isLDA.getSignal} STO:${isSTO.getSignal}")
+    }
+
+    /** Helper to load a program code into SRAM via backdoor access.
+     *
+     */
     def loadProgram(mem: Sram1R1W): Unit = {
+        //LDA = 0x0, STO = 0x1, ADD = 0x2, SUB = 0x3
+        //JMP = 0x4, JGE = 0x5, JNE = 0x6, STP = 0x7
 
         //https://github.com/nkkav/mu0/blob/master/sim/archc/test/test1.hex
                                         //.text:
-        mem.data(0).fromInteger(0x0008) //0000 0008 
-        mem.data(1).fromInteger(0x200a) //0002 200a
-        mem.data(2).fromInteger(0x100c) //0004 100c
-        mem.data(3).fromInteger(0x7000) //0006 7000
+        mem.data(0).fromInteger(0x0008) //0000 0008  LDA 
+        mem.data(1).fromInteger(0x200a) //0002 200a  ADD
+        mem.data(2).fromInteger(0x100c) //0004 100c  JMP
+        mem.data(3).fromInteger(0x7000) //0006 7000  JNE
                                         //.data:
         mem.data(4).fromInteger(0x000a) //0008 000a
         mem.data(5).fromInteger(0x0001) //000a 0001

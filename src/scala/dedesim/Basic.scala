@@ -65,7 +65,7 @@ object Basic {
         (input.wires, output.wires).zipped.foreach((i,o) => dff(clk,i,o))
     }
 
-    def andGate(in1: Wire, in2: Wire, output: Wire): Unit = {
+    def and2Gate(output: Wire, in1: Wire, in2: Wire): Unit = {
         def andAction() = {
             val in1Sig = in1.getSignal
             val in2Sig = in2.getSignal
@@ -77,9 +77,27 @@ object Basic {
         in2 addAction (() => andAction)
     }
 
-    def andGate(in1: Wires, in2: Wires, output: Wires): Unit = {
+    def and2Gate(output: Wires, in1: Wires, in2: Wires): Unit = {
         require(in1.width == in2.width && in2.width == output.width)
-        (in1.wires, in2.wires, output.wires).zipped.foreach((i1,i2,o) => andGate(i1,i2,o))
+        (output.wires, in1.wires, in2.wires).zipped.foreach((o,i1,i2) => and2Gate(o,i1,i2))
+    }
+
+    def andGate(output: Wire, in: Wire*): Unit = {
+        def andAction() = {
+            val andedSigs: Wire#Level = in.foldLeft(true){
+                (allAnded, curWire) => allAnded & curWire.getSignal
+            }
+            sim.afterDelay(andGateDelay) {
+                output setSignal (andedSigs)
+            }
+        }
+        in.foreach(i => i.addAction(() => andAction))
+    }
+
+    def andGate(output: Wires, in: Wires*): Unit = {
+        require(in.forall(i => i.width == output.width))
+        val inWiresList = in.map {w => w.wires}
+        (output.wires, inWiresList).zipped.foreach((o,inWires) => andGate(o,inWires: _*))
     }
 
     def orGate(in1: Wire, in2: Wire, output: Wire) = {
