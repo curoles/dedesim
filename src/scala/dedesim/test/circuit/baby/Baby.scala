@@ -15,6 +15,7 @@ object Baby {
     val OPCODE_WIDTH = 4
     val DATA_WIDTH = 12
     val WORD_WIDTH = OPCODE_WIDTH + DATA_WIDTH
+    val OPCODE_POS = DATA_WIDTH
     val ADDR_WIDTH = 12
     val ADDR_SIZE  = 1 << 12
 }
@@ -82,7 +83,7 @@ class Baby(
     dff(clk, input = new_ir, output = ir)
 
     monitor('level -> ir) {
-        sim.log(s"ir=${ir.getSignalAsInt}")
+        sim.log(s"ir=${ir.getSignalAsInt} opcode=${ir.getSignalAsInt >> Baby.DATA_WIDTH}")
     }
 
     //val LDA = b"0000"
@@ -226,7 +227,7 @@ end
             name = "decoder",
             clk = clk,
             reset = reset,
-            opcode = wires("FIXME",4,0x1),
+            opcode = ir.newSlice("ir", Baby.OPCODE_POS, Baby.OPCODE_POS + Baby.OPCODE_WIDTH - 1),
             isLDA = isLDA,
             isSTO = isSTO,
             isADD = isADD,
@@ -273,7 +274,9 @@ end
         andGate(output = isJNE, opcodeN.wires(3),  opcode.wires(2),  opcode.wires(1), opcodeN.wires(0))
         andGate(output = isSTP, opcodeN.wires(3),  opcode.wires(2),  opcode.wires(1),  opcode.wires(0))
 
-        sim.log(s"OPCODE=${opcode.getSignalAsInt} LDA:${isLDA.getSignal} STO:${isSTO.getSignal}")
+        monitor('level -> opcode) {
+            sim.log(s"OPCODE=${opcode.getSignalAsInt} LDA:${isLDA.getSignal} STO:${isSTO.getSignal}")
+        }
     }
 
     /** Helper to load a program code into SRAM via backdoor access.

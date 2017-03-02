@@ -96,8 +96,9 @@ object Basic {
 
     def andGate(output: Wires, in: Wires*): Unit = {
         require(in.forall(i => i.width == output.width))
-        val inWiresList = in.map {w => w.wires}
-        (output.wires, inWiresList).zipped.foreach((o,inWires) => andGate(o,inWires: _*))
+        output.wires.zipWithIndex.foreach { case (o,index) =>
+            andGate(o, in.map(i => i.wires(index)) :_*)
+        }
     }
 
     def orGate(in1: Wire, in2: Wire, output: Wire) = {
@@ -265,4 +266,23 @@ class BasicGatesSpec extends FlatSpec {
         assert(sum.getSignalAsInt == (7+1))
     }
 
+    it should "1 and 1 and 1 = 1" in {
+        val in1 = new Wire(null, "in1", 1)
+        val in2 = new Wire(null, "in2", 1)
+        val in3 = new Wire(null, "in3", 1)
+        val allAnded = new Wire(null, "allAnded")
+        Basic.andGate(output = allAnded, in1, in2, in3)
+        sim.run(1)
+        assert(allAnded.getSignalAsInt == 1)
+    }
+
+    it should "2 and 3 and 7 = 2" in {
+        val in1 = new Wires(null, "in1", 5, 0x2)
+        val in2 = new Wires(null, "in2", 5, 0x3)
+        val in3 = new Wires(null, "in3", 5, 0x7)
+        val allAnded = new Wires(null, "allAnded", 5)
+        Basic.andGate(output = allAnded, in1, in2, in3)
+        sim.run(1)
+        assert(allAnded.getSignalAsInt == 0x2)
+    }
 }

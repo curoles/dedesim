@@ -51,7 +51,7 @@ class Wire(parent: Component, name: String, initVal: Int = 0)
 
 }
 
-class Wires(parent: Component, name: String, val width: Int, initVal: Int = 0)
+class Wires(parent: Component, name: String, val width: Int, initVal: Long = 0)
     extends Component(parent, name, 'wires)
     with Trigger
 {
@@ -60,7 +60,15 @@ class Wires(parent: Component, name: String, val width: Int, initVal: Int = 0)
     val wires = new Array[Wire](width)
 
     for { i <- wires.indices } {
-        wires(i) = new Wire(this, s"$i", initVal & (1 << i))
+        wires(i) = new Wire(this, s"$i", (initVal & (1L << i)).toInt)
+    }
+
+    /** Construct from another existing wires */
+    def this(name: String, origin: Wires, from: Int, to: Int) {
+        this(origin.parent, name, to - from + 1, 0)
+        for (index <- wires.indices) {
+            wires(index) = origin.wires(from + index)
+        }
     }
 
     def getSignal(bitNum: Int) = wires(bitNum).getSignal
@@ -89,5 +97,10 @@ class Wires(parent: Component, name: String, val width: Int, initVal: Int = 0)
         wires.foreach(wire => wire.addAction(a))
     }
 
+    def slice(from: Int, to: Int): Array[Wire] = wires.slice(from = from, until = to + 1)
+
+    def newSlice(name: String, from: Int, to: Int): Wires = {
+        new Wires(name, this, from, to)
+    }
 }
 
