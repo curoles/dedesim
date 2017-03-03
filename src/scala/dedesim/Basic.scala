@@ -101,7 +101,7 @@ object Basic {
         }
     }
 
-    def orGate(in1: Wire, in2: Wire, output: Wire) = {
+    def or2Gate(in1: Wire, in2: Wire, output: Wire) = {
         def orAction() = {
             val in1Sig = in1.getSignal
             val in2Sig = in2.getSignal
@@ -113,11 +113,29 @@ object Basic {
         in2 addAction (() => orAction)
     }
 
-    def orGate(in1: Wires, in2: Wires, output: Wires): Unit = {
+    def or2Gate(in1: Wires, in2: Wires, output: Wires): Unit = {
         require(in1.width == in2.width && in2.width == output.width)
         (in1.wires, in2.wires, output.wires).zipped.foreach((i1,i2,o) => orGate(i1,i2,o))
     }
 
+    def orGate(output: Wire, in: Wire*): Unit = {
+        def orAction() = {
+            val oredSigs: Wire#Level = in.foldLeft(true){
+                (allOred, curWire) => allOred & curWire.getSignal
+            }
+            sim.afterDelay(orGateDelay) {
+                output setSignal (oredSigs)
+            }
+        }
+        in.foreach(i => i.addAction(() => orAction))
+    }
+
+    def orGate(output: Wires, in: Wires*): Unit = {
+        require(in.forall(i => i.width == output.width))
+        output.wires.zipWithIndex.foreach { case (o,index) =>
+            orGate(o, in.map(i => i.wires(index)) :_*)
+        }
+    }
 
     def monitor(components: Tuple2[Symbol,Trigger]*)(block: => Unit) = {
         def monitorLevel() = {

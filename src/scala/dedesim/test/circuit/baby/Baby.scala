@@ -83,7 +83,7 @@ class Baby(
     dff(clk, input = new_ir, output = ir)
 
     monitor('level -> ir) {
-        sim.log(s"ir=${ir.getSignalAsInt} opcode=${ir.getSignalAsInt >> Baby.DATA_WIDTH}")
+        sim.log(s"ir=${ir.getSignalAsInt.toHexString} opcode=${ir.getSignalAsInt >> Baby.DATA_WIDTH}")
     }
 
     //val LDA = b"0000"
@@ -209,7 +209,9 @@ end
         name: String,
         clk: Wire,
         reset: Wire,
-        ir: Wires
+        ir: Wires/*,
+        curPC: Wires,
+        nextPC: Wires*/
     )
         extends Module(parent, name)
     {
@@ -237,8 +239,26 @@ end
             isJNE = isJNE,
             isSTP = isSTP
         )
-        //val isAccWrite = wire("isAccWrite")
-        //or3(output = isAccWrite, isLDA, isADD, isSUB)
+
+        val acc = wires("acc", Baby.DATA_WIDTH)
+        val isAccNotEqZero = wire("isAccNotEqZero")
+        orGate(output = isAccNotEqZero, acc.wires: _*)
+
+        val isAccWrite = wire("isAccWrite")
+        orGate(output = isAccWrite, isLDA, isADD, isSUB)
+
+        val memReadAddr = ir.newSlice("memReadAddr", 0, Baby.OPCODE_WIDTH - 1)
+        //readAddr,
+        //readData,
+
+        //val isAccRead = wire("isAccRead")
+        //orGate(output = isAccRead, isLDA, isADD, isSUB)
+
+//        val isJump = wire("isJump")
+  //      orGate(output = isJump, isSTP, isJMP)
+        //nextPC=basePC+offsetPC
+        //basePC = curPC or 0(if jump)
+        //offsetPC = 1 or jumpAddr
     }
 
     /** Decoder.
@@ -288,10 +308,10 @@ end
 
         //https://github.com/nkkav/mu0/blob/master/sim/archc/test/test1.hex
                                         //.text:
-        mem.data(0).fromInteger(0x0008) //0000 0008  LDA 
-        mem.data(1).fromInteger(0x200a) //0002 200a  ADD
-        mem.data(2).fromInteger(0x100c) //0004 100c  JMP
-        mem.data(3).fromInteger(0x7000) //0006 7000  JNE
+        mem.data(0).fromInteger(0x0008) //0000 0008  0 LDA acc=mem[8]   ;acc=a
+        mem.data(1).fromInteger(0x200a) //0002 200a  2 ADD acc+=mem[a]  ;acc=a+1
+        mem.data(2).fromInteger(0x100c) //0004 100c  1 JMP pc=c
+        mem.data(3).fromInteger(0x7000) //0006 7000  7 JNE pc=0
                                         //.data:
         mem.data(4).fromInteger(0x000a) //0008 000a
         mem.data(5).fromInteger(0x0001) //000a 0001
