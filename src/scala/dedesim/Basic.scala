@@ -120,8 +120,8 @@ object Basic {
 
     def orGate(output: Wire, in: Wire*): Unit = {
         def orAction() = {
-            val oredSigs: Wire#Level = in.foldLeft(true){
-                (allOred, curWire) => allOred & curWire.getSignal
+            val oredSigs: Wire#Level = in.foldLeft(false){
+                (allOred, curWire) => allOred | curWire.getSignal
             }
             sim.afterDelay(orGateDelay) {
                 output setSignal (oredSigs)
@@ -141,9 +141,13 @@ object Basic {
         def monitorLevel() = {
             sim.afterDelay(delay = 0)(block)
         }
+        def monitorRise(t: Trigger) = {
+            val wire = t.asInstanceOf[Wire]
+            if (wire.getSignal == true) { sim.afterDelay(delay = 0)(block) }
+        }
         def addMonitorAction(c: Tuple2[Symbol,Trigger]) = {
             val action: De.Action = c._1 match {
-                //case 'rise => monitorRise
+                case 'rise => (() => monitorRise(c._2))
                 //case 'fall => monitorFall
                 case _     => (() => monitorLevel)
             }
@@ -202,7 +206,7 @@ object Basic {
         (read.wires, write.wires).zipped.foreach((r,w) => register(clk, r, w, write_en))
     }
 
-    def adder(in1: Wires, in2: Wires, output: Wires): Unit = {
+    def adder(output: Wires, in1: Wires, in2: Wires): Unit = {
         require(in1.width == in2.width && in2.width == output.width)
         def adderAction() = {
             val in1Sig = in1.getSignalAsInt
@@ -303,4 +307,15 @@ class BasicGatesSpec extends FlatSpec {
         sim.run(1)
         assert(allAnded.getSignalAsInt == 0x2)
     }
+
+    it should "1 or 2 or 4 = 7" in {
+        val in1 = new Wires(null, "in1", 5, 0x1)
+        val in2 = new Wires(null, "in2", 5, 0x2)
+        val in3 = new Wires(null, "in3", 5, 0x4)
+        val allOred = new Wires(null, "allOred", 5)
+        Basic.orGate(output = allOred, in1, in2, in3)
+        sim.run(1)
+        assert(allOred.getSignalAsInt == 0x7)
+    }
+
 }

@@ -11,20 +11,22 @@ import curoles.dedesim.Module
 import curoles.dedesim.Wire
 import curoles.dedesim.Wires
 import curoles.dedesim.Simulator.sim
+import curoles.dedesim.Basic
 
 /** Static two-port one read one write RAM.
  *
  * http://www-inst.eecs.berkeley.edu/~cs150/fa13/agenda/lec/lec11-sram.pdf
  */
-class Sram1R1W(
+class Sram2R1W(
     parent: Component,
     name: String,
     wordWidth: Int,
     size: Int,
     clk: Wire,
-    //readEnable: Wire,
     readAddr: Wires,
     readData: Wires,
+    readAddr2: Wires,
+    readData2: Wires,
     writeEnable: Wire,
     writeAddr: Wires,
     writeData: Wires
@@ -34,6 +36,7 @@ class Sram1R1W(
 {
     require(wordWidth > 0 && size > 0)
     require(readData.width >= wordWidth)
+    require(readData2.width >= wordWidth)
     require(writeData.width >= wordWidth)
 
     val data: Array[Word] = Array.fill(size){new Word(wordWidth)} //new Array[Word](size)
@@ -71,7 +74,12 @@ class Sram1R1W(
 
 
     implementRead(readAddr, readData)
+    implementRead(readAddr2, readData2)
     implementWrite(writeAddr, writeData)
+
+    Basic.monitor('rise -> clk) {
+        sim.log(f"SRAM2R1W RA=${readAddr.getSignalAsInt}%03x RD=${readData.getSignalAsInt}%04x RA2=${readAddr2.getSignalAsInt}%03x RD2=${readData2.getSignalAsInt}%04x WA=${writeAddr.getSignalAsInt}%03x WD=${writeData.getSignalAsInt}%04x WE=${writeEnable.getSignal}")
+    }
 }
 
 import org.scalatest.FlatSpec
