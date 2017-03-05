@@ -9,21 +9,43 @@ package curoles.dedesim
  *  changes it can trigger changes for other wires
  *  and Trigger objects. 
  */
-class Wire(parent: Component, name: String, initVal: Int = 0)
+class WireIn(parent: Component, name: String, initVal: Int = 0)
     extends Component(parent, name, 'wire)
-    with Trigger {
+    with Trigger
+{
 
     /** Wire can have only 2 states: HI or LOW */
     type Level = Boolean
 
     /** Current value */
-    private var sigVal: Level = if (initVal == 0) false else true
+    protected var sigVal: Level = if (initVal == 0) false else true
 
     /** Get current value */
     def getSignal : Level = sigVal
 
     def getSignalAsInt: Int = if (getSignal == true) 1 else 0
 
+    def int = getSignalAsInt
+
+    ///** Change value if new value != current value */
+    //def setSignal(newSigVal: Level) : Unit = {
+    //    if (newSigVal != sigVal) {
+    //        sigVal = newSigVal
+    //        changeEvent(this)
+    //        act // trigger associated actions
+    //    }
+    //}
+
+    /** Points to current event handler */
+    var changeEvent: (Wire) => Unit = dontSendChangeEvent
+
+    /** Do not send change event, do nothing */
+    def dontSendChangeEvent(wire: Wire): Unit = { }
+}
+
+class Wire(parent: Component, name: String, initVal: Int = 0)
+    extends WireIn(parent, name, initVal)
+{
     /** Change value if new value != current value */
     def setSignal(newSigVal: Level) : Unit = {
         if (newSigVal != sigVal) {
@@ -32,23 +54,6 @@ class Wire(parent: Component, name: String, initVal: Int = 0)
             act // trigger associated actions
         }
     }
-
-    /*override def addAction(a: Action) = {
-        sim.log("wire add action:" + a.toString)
-        actions = a :: actions
-        a()
-    }*/
-
-    /** Points to current event handler */
-    var changeEvent: (Wire) => Unit = dontSendChangeEvent
-
-    /** Do not send change event, do nothing */
-    def dontSendChangeEvent(wire: Wire): Unit = { }
-
-    //def sendChangeEvent(sigVal: Level): Unit = {
-    //    msg.wireEvent(sim.currentTime, id, sigVal)
-    //}
-
 }
 
 class Wires(parent: Component, name: String, val width: Int, initVal: Long = 0)
@@ -78,6 +83,8 @@ class Wires(parent: Component, name: String, val width: Int, initVal: Long = 0)
            case(acc,(wire,i)) => acc + (wire.getSignalAsInt << i)
         }
     }
+
+    def int = getSignalAsInt
 
     def setSignal(bitNum: Int, newVal: Wire#Level) = {
         wires(bitNum).setSignal(newVal)

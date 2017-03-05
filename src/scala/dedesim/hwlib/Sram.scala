@@ -9,6 +9,7 @@ package curoles.dedesim.hwlib
 import curoles.dedesim.Component
 import curoles.dedesim.Module
 import curoles.dedesim.Wire
+import curoles.dedesim.WireIn
 import curoles.dedesim.Wires
 import curoles.dedesim.Simulator.sim
 import curoles.dedesim.Basic
@@ -22,7 +23,7 @@ class Sram2R1W(
     name: String,
     wordWidth: Int,
     size: Int,
-    clk: Wire,
+    clk: WireIn,
     readAddr: Wires,
     readData: Wires,
     readAddr2: Wires,
@@ -41,13 +42,18 @@ class Sram2R1W(
 
     val data: Array[Word] = Array.fill(size){new Word(wordWidth)} //new Array[Word](size)
 
+    val bytesPerWord: Int = (wordWidth + 7)/8
+
+    def wordIndexToAddr(index: Int) = index * bytesPerWord
+    def addrToWordIndex(addr: Long) = (addr / bytesPerWord).toInt
+
     def implementRead(addr: Wires, rdData: Wires): Unit = {
         def readAction() = {
-            val addrVal: Int = addr.getSignalAsInt.toInt
+            val wordId: Int = addrToWordIndex(addr.getSignalAsInt)
             sim.afterDelay(0) {
                 for (pos <- 0 until wordWidth) {
                     //sim.log(s"SRAM ${name} read at address ${addrVal} bit ${pos}")
-                    rdData.setSignal(pos, data(addrVal).getBit(pos))
+                    rdData.setSignal(pos, data(wordId).getBit(pos))
                 }
             }
         }
@@ -60,10 +66,10 @@ class Sram2R1W(
         def writeAction() = {
             val posedgeClk = clk.getSignal == true
             if (posedgeClk && writeEnable.getSignal) {
-                val addrVal: Int = addr.getSignalAsInt.toInt
+                val wordId: Int = addrToWordIndex(addr.getSignalAsInt)
                 sim.afterDelay(0) {
                     for (pos <- 0 until wordWidth) {
-                        data(addrVal).setBit(pos, wrData.getSignal(pos))
+                        data(wordId).setBit(pos, wrData.getSignal(pos))
                     }
                 }
             }

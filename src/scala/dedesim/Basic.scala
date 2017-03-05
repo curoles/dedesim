@@ -47,7 +47,7 @@ object Basic {
         (input.wires, output.wires).zipped.foreach((i,o) => follow(i,o))
     }
 
-    def dff(clk: Wire, input: Wire, output: Wire): Unit = {
+    def dff(clk: WireIn, input: Wire, output: Wire): Unit = {
         def dffAction() = {
            val posedgeClk = clk.getSignal == true
            if (posedgeClk) {
@@ -60,7 +60,7 @@ object Basic {
         clk addAction (() => dffAction)
     }
 
-    def dff(clk: Wire, input: Wires, output: Wires): Unit = {
+    def dff(clk: WireIn, input: Wires, output: Wires): Unit = {
         require(input.width == output.width)
         (input.wires, output.wires).zipped.foreach((i,o) => dff(clk,i,o))
     }
@@ -145,10 +145,14 @@ object Basic {
             val wire = t.asInstanceOf[Wire]
             if (wire.getSignal == true) { sim.afterDelay(delay = 0)(block) }
         }
+        def monitorFall(t: Trigger) = {
+            val wire = t.asInstanceOf[Wire]
+            if (wire.getSignal == false) { sim.afterDelay(delay = 0)(block) }
+        }
         def addMonitorAction(c: Tuple2[Symbol,Trigger]) = {
             val action: De.Action = c._1 match {
                 case 'rise => (() => monitorRise(c._2))
-                //case 'fall => monitorFall
+                case 'fall => (() => monitorFall(c._2))
                 case _     => (() => monitorLevel)
             }
             c._2.addAction(action)
@@ -156,7 +160,7 @@ object Basic {
         components foreach addMonitorAction
     }
 
-    def mux2to1(select: Wire, in1: Wire, in2: Wire, output: Wire): Unit = {
+    def mux2to1(select: WireIn, in1: Wire, in2: Wire, output: Wire): Unit = {
         def muxAction() = {
             val in1Sig = in1.getSignal
             val in2Sig = in2.getSignal
@@ -170,7 +174,7 @@ object Basic {
         select addAction (() => muxAction)
     }
 
-    def mux2to1(select: Wire, in1: Wires, in2: Wires, output: Wires): Unit = {
+    def mux2to1(select: WireIn, in1: Wires, in2: Wires, output: Wires): Unit = {
         require(in1.width == in2.width && in2.width == output.width)
         (in1.wires, in2.wires, output.wires).zipped.foreach((i1,i2,o) => mux2to1(select,i1,i2,o))
     }
@@ -195,13 +199,13 @@ object Basic {
      *         write_en     clk
      *  </pre>
      */
-    def register(clk: Wire, read: Wire, write: Wire, write_en: Wire): Unit = {
+    def register(clk: WireIn, read: Wire, write: Wire, write_en: Wire): Unit = {
         val new_reg_val = new Wire(null, "new_reg_val")
         mux2to1(select = write_en, in1 = read, in2 = write, output = new_reg_val)
         dff(clk = clk, input = new_reg_val, output = read)
     }
 
-    def register(clk: Wire, read: Wires, write: Wires, write_en: Wire): Unit = {
+    def register(clk: WireIn, read: Wires, write: Wires, write_en: Wire): Unit = {
         require(read.width == write.width)
         (read.wires, write.wires).zipped.foreach((r,w) => register(clk, r, w, write_en))
     }

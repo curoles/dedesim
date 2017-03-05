@@ -29,8 +29,8 @@ object Baby {
 class Baby(
     parent: Component,
     name: String,
-    clk: Wire,
-    reset: Wire,
+    clk: WireIn,
+    reset: WireIn,
     ir: Wires
 )
     extends Module(parent, name)
@@ -68,9 +68,9 @@ class Baby(
     dff(clk, input = new_pc, output = pc)
 
     val next_pc = wires("next_pc", Baby.ADDR_WIDTH)
-    val addr_1 = wires("addr_1", Baby.ADDR_WIDTH, 1)
+    val addr_2 = wires("addr_2", Baby.ADDR_WIDTH, 2)
     mux2to1(select = reset, in2 = zero_addr, in1 = next_pc, output = new_pc)
-    adder(output = next_pc, in1 = pc, in2 = addr_1)
+    adder(output = next_pc, in1 = pc, in2 = addr_2)
 
     //monitor('level -> pc/*, 'level -> next_pc, 'level -> new_pc*/) {
     //    //sim.log(s"pc=${pc.getSignalAsInt} next_pc=${next_pc.getSignalAsInt} new_pc=${new_pc.getSignalAsInt}")
@@ -126,8 +126,8 @@ class Baby(
     class RegFile(
         parent: Component,
         name: String,
-        clk: Wire,
-        reset: Wire,
+        clk: WireIn,
+        reset: WireIn,
         acc_read: Wires,
         acc_write: Wires,
         acc_write_en: Wire
@@ -159,8 +159,8 @@ class Baby(
     class Executer(
         parent: Component,
         name: String,
-        clk: Wire,
-        reset: Wire,
+        clk: WireIn,
+        reset: WireIn,
         ir: Wires,
         pc: Wires,
         /*nextPC: Wires*/
@@ -215,21 +215,21 @@ class Baby(
         val isAccWrite_d3 = wire("isAccWrite_d3")
         dff(clk = clk, output = isAccWrite_d3, input = isAccWrite_d2)
 
+        val isAccRead = wire("isAccRead")
+        orGate(output = isAccRead, isSTO, isADD, isSUB)
+        val isAccRead_d1 = wire("isAccRead_d1")
+        dff(clk = clk, output = isAccRead_d1, input = isAccRead)
 
         //val isAccNotEqZero = wire("isAccNotEqZero")
         //orGate(output = isAccNotEqZero, acc.wires: _*)
 
-        //val isAccRead = wire("isAccRead")
-        //orGate(output = isAccRead, isLDA, isADD, isSUB)
 
         //val isMemStore = wire("isMemStore")
         //orGate(output = isMemStore, isSTO)
 
         val memAddrIRSlice = ir.newSlice("memAddrIRSlice", 0, Baby.DATA_WIDTH - 1)
-        val memAddr = wires("memAddr", Baby.ADDR_WIDTH)
-        dff(clk = clk, output = memAddr, input = memAddrIRSlice)
-        follow(output = memReadAddr, input = memAddr)
-        follow(output = memWriteAddr, input = memAddr)
+        follow(output = memReadAddr, input = memAddrIRSlice)
+        follow(output = memWriteAddr, input = memAddrIRSlice)
 
         val ir_d1 = wires("ir_d1", Baby.WORD_WIDTH)
         dff(clk = clk, output = ir_d1, input = ir)
@@ -256,18 +256,18 @@ class Baby(
         // Pipeline stage #2 READ DATA
         //////////////////////////////
 
-        val memData = wires("memData", Baby.DATA_WIDTH)
         val memDataReadSlice = memReadData.newSlice("memDataReadSlice", 0, Baby.DATA_WIDTH - 1)
-        dff(clk = clk, output = memData, input = memDataReadSlice)
 
         val source1 = wires("source1", Baby.DATA_WIDTH)
         val source2 = wires("source2", Baby.DATA_WIDTH)
 
         val dataZero = wires("dataZero", Baby.DATA_WIDTH, 0)
+        val zero_or_acc = wires("zero_or_acc", Baby.DATA_WIDTH)
+        mux2to1(select = isAccRead_d1, output = zero_or_acc, in1 = dataZero, in2 = acc_d1)
 
         // If MEM read then source1 is memData
-        follow(output = source1, input = memData)
-        follow(output = source2, input = dataZero) 
+        dff(clk, output = source1, input = memDataReadSlice)
+        dff(clk, output = source2, input = zero_or_acc) 
 
         val source1_d1 = wires("source1_d1", Baby.DATA_WIDTH)
         dff(clk = clk, output = source1_d1, input = source1)
@@ -297,19 +297,20 @@ class Baby(
         // If isExeFlowChange then pc = result
 
         monitor('rise -> clk) {
-            //sim.log(f"Executer PC=${pc_d3.getSignalAsInt}%012x IR=${ir_d3.getSignalAsInt}%016x")
-            //sim.log(f"Executer IR=${ir_d3.getSignalAsInt}%04x")
 sim.log( "Pipe    _WB_ EXE_ _RD_ DECD")
-sim.log(f"Pipe PC=${pc_d3.getSignalAsInt}%04x ${pc_d2.getSignalAsInt}%04x ${pc_d1.getSignalAsInt}%04x ${pc.getSignalAsInt}%04x")
-sim.log(f"Pipe IR=${ir_d3.getSignalAsInt}%04x ${ir_d2.getSignalAsInt}%04x ${ir_d1.getSignalAsInt}%04x ${ir.getSignalAsInt}%04x")
-sim.log(f"Pipe AC=${acc_d3.getSignalAsInt}%04x ${acc_d2.getSignalAsInt}%04x ${acc_d1.getSignalAsInt}%04x ${accRead.getSignalAsInt}%04x")
-sim.log(f"Pipe AW=${isAccWrite_d3.getSignalAsInt}%4d ${isAccWrite_d2.getSignalAsInt}%4d ${isAccWrite_d1.getSignalAsInt}%4d ${isAccWrite.getSignalAsInt}%4d")
+sim.log(f"Pipe PC=${pc_d3.int}%04x ${pc_d2.int}%04x ${pc_d1.int}%04x ${pc.int}%04x")
+sim.log(f"Pipe IR=${ir_d3.int}%04x ${ir_d2.int}%04x ${ir_d1.int}%04x ${ir.int}%04x")
+sim.log(f"Pipe AC=${acc_d3.int}%04x ${acc_d2.int}%04x ${acc_d1.int}%04x ${accRead.int}%04x")
+sim.log(f"Pipe AW=${isAccWrite_d3.int}%4d ${isAccWrite_d2.int}%4d ${isAccWrite_d1.int}%4d ${isAccWrite.int}%4d")
+sim.log(f"Pipe RS=${result_d1.int}%04x ${result.int}%04x")
 
             if (isAccWrite_d3.getSignal == true) {
-                sim.log(f"Executer ACC <- ${result_d1.getSignalAsInt}%03x")
+                sim.log(f"Executer ACC <- ${result_d1.int}%03x")
             }
 
-sim.log(f"mem ADDR=${memAddr.getSignalAsInt}%03x  DATA=${memData.getSignalAsInt}%03x")
+sim.log(f"mem ADDR=${memAddrIRSlice.int}%03x  DATA=${memDataReadSlice.int}%03x")
+
+
         }
     }
 
@@ -319,8 +320,8 @@ sim.log(f"mem ADDR=${memAddr.getSignalAsInt}%03x  DATA=${memData.getSignalAsInt}
     class Decoder(
         parent: Component,
         name: String,
-        clk: Wire,
-        reset: Wire,
+        clk: WireIn,
+        reset: WireIn,
         opcode: Wires,
         isLDA: Wire, // 4'b0000
         isSTO: Wire, // 4'b0001
@@ -380,7 +381,7 @@ class TB(parent: Component, name: String) extends Module(parent, name) {
     //val STOP_OPCODE = 4'b0111
 
     val clk = wire("clk", 1)
-    val reset = wire("reset")
+    val reset = wire("reset", 1)
 
     // Clock generator
     clock(period = 5, clk) // 5 low and 5 high ticks, 10 ticks between posedges.
@@ -405,6 +406,10 @@ class TB(parent: Component, name: String) extends Module(parent, name) {
             sim.log("STOP instruction executed, end of simulation")
             sim.finish
         }*/
+    }
+
+    monitor('fall -> reset) {
+       sim.log(s"***   RESET true->${reset.getSignal}   ***")
     }
 
     //if (monitorEnabled) {
