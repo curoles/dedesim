@@ -1,4 +1,4 @@
-/* Copyright (c) Igor Lesik 2016
+/* Copyright (c) Igor Lesik 2016-17
  *
  */
 
@@ -15,8 +15,10 @@ object Basic {
     var inverterDelay = 0
     var andGateDelay = 0
     var orGateDelay = 0
+    var muxDelay = 0
 
-    def inverter(input: Wire, output: Wire): Unit = {
+    /** Inverts signal level */
+    def inverter(output: Wire, input: WireIn): Unit = {
         def invertAction() = {
            val inputSig = input.getSignal
            sim.afterDelay(inverterDelay) {
@@ -26,13 +28,17 @@ object Basic {
         input addAction (() => invertAction)
     }
 
-    def inverter(input: Wires, output: Wires): Unit = {
+    /** Inverts signal level for each wire */
+    def inverter(output: Wires, input: WiresIn): Unit = {
         require(input.width == output.width)
-        (input.wires, output.wires).zipped.foreach((i,o) => inverter(i,o))
+        (output.wires, input.wires).zipped.foreach((o,i) => inverter(o,i))
     }
 
-
-    def follow(input: Wire, output: Wire): Unit = {
+    /** No delay buffer, makes one signal repeat/follow another.
+     *
+     *  Similar in purpose to "assign" in Verilog.
+     */
+    def follow(output: Wire, input: WireIn): Unit = {
         def followAction() = {
            val inputSig = input.getSignal
            sim.afterDelay(0) {
@@ -42,12 +48,17 @@ object Basic {
         input addAction (() => followAction)
     }
 
-    def follow(input: Wires, output: Wires): Unit = {
+    /** No delay buffer, makes one signal repeat/follow another.
+     *
+     *  Similar in purpose to "assign" in Verilog.
+     */
+    def follow(output: Wires, input: WiresIn): Unit = {
         require(input.width == output.width)
-        (input.wires, output.wires).zipped.foreach((i,o) => follow(i,o))
+        (output.wires, input.wires).zipped.foreach((o,i) => follow(o,i))
     }
 
-    def dff(clk: WireIn, input: Wire, output: Wire): Unit = {
+    /** Posedge D Flip Flop */
+    def dff(clk: WireIn, output: Wire, input: WireIn): Unit = {
         def dffAction() = {
            val posedgeClk = clk.getSignal == true
            if (posedgeClk) {
@@ -60,12 +71,13 @@ object Basic {
         clk addAction (() => dffAction)
     }
 
-    def dff(clk: WireIn, input: Wires, output: Wires): Unit = {
+    /** Posedge D Flip Flop */
+    def dff(clk: WireIn, output: Wires, input: WiresIn): Unit = {
         require(input.width == output.width)
-        (input.wires, output.wires).zipped.foreach((i,o) => dff(clk,i,o))
+        (output.wires, input.wires).zipped.foreach((o,i) => dff(clk,o,i))
     }
 
-    def and2Gate(output: Wire, in1: Wire, in2: Wire): Unit = {
+    def and2Gate(output: Wire, in1: WireIn, in2: WireIn): Unit = {
         def andAction() = {
             val in1Sig = in1.getSignal
             val in2Sig = in2.getSignal
@@ -77,12 +89,12 @@ object Basic {
         in2 addAction (() => andAction)
     }
 
-    def and2Gate(output: Wires, in1: Wires, in2: Wires): Unit = {
+    def and2Gate(output: Wires, in1: WiresIn, in2: WiresIn): Unit = {
         require(in1.width == in2.width && in2.width == output.width)
         (output.wires, in1.wires, in2.wires).zipped.foreach((o,i1,i2) => and2Gate(o,i1,i2))
     }
 
-    def andGate(output: Wire, in: Wire*): Unit = {
+    def andGate(output: Wire, in: WireIn*): Unit = {
         def andAction() = {
             val andedSigs: Wire#Level = in.foldLeft(true){
                 (allAnded, curWire) => allAnded & curWire.getSignal
@@ -94,14 +106,14 @@ object Basic {
         in.foreach(i => i.addAction(() => andAction))
     }
 
-    def andGate(output: Wires, in: Wires*): Unit = {
+    def andGate(output: Wires, in: WiresIn*): Unit = {
         require(in.forall(i => i.width == output.width))
         output.wires.zipWithIndex.foreach { case (o,index) =>
             andGate(o, in.map(i => i.wires(index)) :_*)
         }
     }
 
-    def or2Gate(in1: Wire, in2: Wire, output: Wire) = {
+    def or2Gate(output: Wire, in1: WireIn, in2: WireIn) = {
         def orAction() = {
             val in1Sig = in1.getSignal
             val in2Sig = in2.getSignal
@@ -113,12 +125,12 @@ object Basic {
         in2 addAction (() => orAction)
     }
 
-    def or2Gate(in1: Wires, in2: Wires, output: Wires): Unit = {
+    def or2Gate(output: Wires, in1: WiresIn, in2: WiresIn): Unit = {
         require(in1.width == in2.width && in2.width == output.width)
-        (in1.wires, in2.wires, output.wires).zipped.foreach((i1,i2,o) => orGate(i1,i2,o))
+        (output.wires,in1.wires,in2.wires).zipped.foreach((o,i1,i2) => orGate(o,i1,i2))
     }
 
-    def orGate(output: Wire, in: Wire*): Unit = {
+    def orGate(output: Wire, in: WireIn*): Unit = {
         def orAction() = {
             val oredSigs: Wire#Level = in.foldLeft(false){
                 (allOred, curWire) => allOred | curWire.getSignal
@@ -130,13 +142,15 @@ object Basic {
         in.foreach(i => i.addAction(() => orAction))
     }
 
-    def orGate(output: Wires, in: Wires*): Unit = {
+    def orGate(output: Wires, in: WiresIn*): Unit = {
         require(in.forall(i => i.width == output.width))
         output.wires.zipWithIndex.foreach { case (o,index) =>
             orGate(o, in.map(i => i.wires(index)) :_*)
         }
     }
 
+    /** Monitors signals and calls back when any of them changed.
+     */
     def monitor(components: Tuple2[Symbol,Trigger]*)(block: => Unit) = {
         def monitorLevel() = {
             sim.afterDelay(delay = 0)(block)
@@ -160,12 +174,12 @@ object Basic {
         components foreach addMonitorAction
     }
 
-    def mux2to1(select: WireIn, in1: Wire, in2: Wire, output: Wire): Unit = {
+    def mux2to1(select: WireIn, in1: WireIn, in2: WireIn, output: Wire): Unit = {
         def muxAction() = {
             val in1Sig = in1.getSignal
             val in2Sig = in2.getSignal
             val selSig = select.getSignal
-            sim.afterDelay(0) {
+            sim.afterDelay(muxDelay) {
                 output setSignal (if (selSig) in2Sig else in1Sig)
             }
         }
@@ -174,7 +188,7 @@ object Basic {
         select addAction (() => muxAction)
     }
 
-    def mux2to1(select: WireIn, in1: Wires, in2: Wires, output: Wires): Unit = {
+    def mux2to1(select: WireIn, in1: WiresIn, in2: WiresIn, output: Wires): Unit = {
         require(in1.width == in2.width && in2.width == output.width)
         (in1.wires, in2.wires, output.wires).zipped.foreach((i1,i2,o) => mux2to1(select,i1,i2,o))
     }
@@ -199,18 +213,18 @@ object Basic {
      *         write_en     clk
      *  </pre>
      */
-    def register(clk: WireIn, read: Wire, write: Wire, write_en: Wire): Unit = {
+    def register(clk: WireIn, read: Wire, write: WireIn, write_en: WireIn): Unit = {
         val new_reg_val = new Wire(null, "new_reg_val")
         mux2to1(select = write_en, in1 = read, in2 = write, output = new_reg_val)
         dff(clk = clk, input = new_reg_val, output = read)
     }
 
-    def register(clk: WireIn, read: Wires, write: Wires, write_en: Wire): Unit = {
+    def register(clk: WireIn, read: Wires, write: WiresIn, write_en: WireIn): Unit = {
         require(read.width == write.width)
         (read.wires, write.wires).zipped.foreach((r,w) => register(clk, r, w, write_en))
     }
 
-    def adder(output: Wires, in1: Wires, in2: Wires): Unit = {
+    def adder(output: Wires, in1: WiresIn, in2: WiresIn): Unit = {
         require(in1.width == in2.width && in2.width == output.width)
         def adderAction() = {
             val in1Sig = in1.getSignalAsInt
@@ -237,6 +251,22 @@ class BasicGatesSpec extends FlatSpec {
             }
         }
         output.addAction(() => clockAction())
+    }
+
+    it should "invert b101 to b010" in {
+        val in = new Wires(null, "in", 3, 0x5)
+        val out = new Wires(null, "out", 3)
+        Basic.inverter(output=out, input = in)
+        sim.run(1)
+        assert(out.int == 0x2)
+    }
+
+    it should "follow b101 as b101" in {
+        val in = new Wires(null, "in", 3, 0x5)
+        val out = new Wires(null, "out", 3)
+        Basic.follow(output=out, input = in)
+        sim.run(1)
+        assert(out.int == 0x5)
     }
 
     it should "mux2to1 outputs in1 when sel is 0 and in2 when sel is 1" in {

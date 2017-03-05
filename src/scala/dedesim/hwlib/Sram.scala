@@ -11,6 +11,7 @@ import curoles.dedesim.Module
 import curoles.dedesim.Wire
 import curoles.dedesim.WireIn
 import curoles.dedesim.Wires
+import curoles.dedesim.WiresIn
 import curoles.dedesim.Simulator.sim
 import curoles.dedesim.Basic
 
@@ -24,13 +25,13 @@ class Sram2R1W(
     wordWidth: Int,
     size: Int,
     clk: WireIn,
-    readAddr: Wires,
+    readAddr: WiresIn,
     readData: Wires,
-    readAddr2: Wires,
+    readAddr2: WiresIn,
     readData2: Wires,
-    writeEnable: Wire,
-    writeAddr: Wires,
-    writeData: Wires
+    writeEnable: WireIn,
+    writeAddr: WiresIn,
+    writeData: WiresIn
 )
     extends Module(parent, name)
     //with MemWithBackdoor
@@ -47,7 +48,7 @@ class Sram2R1W(
     def wordIndexToAddr(index: Int) = index * bytesPerWord
     def addrToWordIndex(addr: Long) = (addr / bytesPerWord).toInt
 
-    def implementRead(addr: Wires, rdData: Wires): Unit = {
+    def implementRead(addr: WiresIn, rdData: Wires): Unit = {
         def readAction() = {
             val wordId: Int = addrToWordIndex(addr.getSignalAsInt)
             sim.afterDelay(0) {
@@ -62,7 +63,7 @@ class Sram2R1W(
         clk.addAction(() => readAction)
     }
 
-    def implementWrite(addr: Wires, wrData: Wires): Unit = {
+    def implementWrite(addr: WiresIn, wrData: WiresIn): Unit = {
         def writeAction() = {
             val posedgeClk = clk.getSignal == true
             if (posedgeClk && writeEnable.getSignal) {
@@ -84,7 +85,7 @@ class Sram2R1W(
     implementWrite(writeAddr, writeData)
 
     Basic.monitor('rise -> clk) {
-        sim.log(f"SRAM2R1W RA=${readAddr.getSignalAsInt}%03x RD=${readData.getSignalAsInt}%04x RA2=${readAddr2.getSignalAsInt}%03x RD2=${readData2.getSignalAsInt}%04x WA=${writeAddr.getSignalAsInt}%03x WD=${writeData.getSignalAsInt}%04x WE=${writeEnable.getSignal}")
+        sim.log(f"SRAM2R1W RA=${readAddr.int}%03x RD=${readData.int}%04x RA2=${readAddr2.int}%03x RD2=${readData2.int}%04x WA=${writeAddr.int}%03x WD=${writeData.int}%04x WE=${writeEnable.getSignal}")
     }
 }
 

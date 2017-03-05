@@ -7,6 +7,7 @@ package curoles.dedesim.hwlib
 
 import curoles.dedesim.Component
 import curoles.dedesim.Module
+import curoles.dedesim.WiresIn
 import curoles.dedesim.Wires
 import curoles.dedesim.Simulator.sim
 
@@ -20,7 +21,7 @@ import curoles.dedesim.Simulator.sim
 class AddrDecoder(
     parent: Component,
     name: String,
-    address: Wires,
+    address: WiresIn,
     select: Wires
 )
     extends Module(parent, name)
@@ -28,7 +29,7 @@ class AddrDecoder(
     // Number of select wires must not be less than 2^N where N is width of address.
     require(select.width >= (1 << address.width))
 
-    def addrDecoder(addr: Wires, output: Wires): Unit = {
+    def addrDecoder(addr: WiresIn, output: Wires): Unit = {
         def decodeAction() = {
             val addrVal: Int = addr.getSignalAsInt.toInt
             sim.afterDelay(0) {

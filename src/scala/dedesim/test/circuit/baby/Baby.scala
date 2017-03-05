@@ -129,7 +129,7 @@ class Baby(
         clk: WireIn,
         reset: WireIn,
         acc_read: Wires,
-        acc_write: Wires,
+        acc_write: WiresIn,
         acc_write_en: Wire
     )
         extends Module(parent, name)
@@ -161,8 +161,8 @@ class Baby(
         name: String,
         clk: WireIn,
         reset: WireIn,
-        ir: Wires,
-        pc: Wires,
+        ir: WiresIn,
+        pc: WiresIn,
         /*nextPC: Wires*/
         memReadAddr: Wires,
         memReadData: Wires,
@@ -261,6 +261,9 @@ class Baby(
         val source1 = wires("source1", Baby.DATA_WIDTH)
         val source2 = wires("source2", Baby.DATA_WIDTH)
 
+        //val acc_or_bypass = wires("acc_or_bypass", Baby.DATA_WIDTH)
+        //mux2to1(select = isAccWrite_d2, output = acc_or_bypass, in1 = acc_d1, in2 = result)
+
         val dataZero = wires("dataZero", Baby.DATA_WIDTH, 0)
         val zero_or_acc = wires("zero_or_acc", Baby.DATA_WIDTH)
         mux2to1(select = isAccRead_d1, output = zero_or_acc, in1 = dataZero, in2 = acc_d1)
@@ -322,7 +325,7 @@ sim.log(f"mem ADDR=${memAddrIRSlice.int}%03x  DATA=${memDataReadSlice.int}%03x")
         name: String,
         clk: WireIn,
         reset: WireIn,
-        opcode: Wires,
+        opcode: WiresIn,
         isLDA: Wire, // 4'b0000
         isSTO: Wire, // 4'b0001
         isADD: Wire, // 4'b0010
