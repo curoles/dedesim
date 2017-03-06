@@ -59,8 +59,8 @@ class Sram2R1W(
             }
         }
 
-        //addr.wires.foreach{ wire => wire.addAction(() => readAction) }
-        clk.addAction(() => readAction)
+        addr.wires.foreach{ wire => wire.addAction(() => readAction) }
+        //clk.addAction(() => readAction)
     }
 
     def implementWrite(addr: WiresIn, wrData: WiresIn): Unit = {

@@ -174,7 +174,7 @@ object Basic {
         components foreach addMonitorAction
     }
 
-    def mux2to1(select: WireIn, in1: WireIn, in2: WireIn, output: Wire): Unit = {
+    def mux2to1(select: WireIn, output: Wire, in1: WireIn, in2: WireIn): Unit = {
         def muxAction() = {
             val in1Sig = in1.getSignal
             val in2Sig = in2.getSignal
@@ -188,9 +188,9 @@ object Basic {
         select addAction (() => muxAction)
     }
 
-    def mux2to1(select: WireIn, in1: WiresIn, in2: WiresIn, output: Wires): Unit = {
+    def mux2to1(select: WireIn, output: Wires, in1: WiresIn, in2: WiresIn): Unit = {
         require(in1.width == in2.width && in2.width == output.width)
-        (in1.wires, in2.wires, output.wires).zipped.foreach((i1,i2,o) => mux2to1(select,i1,i2,o))
+        (output.wires, in1.wires, in2.wires).zipped.foreach((o,i1,i2) => mux2to1(select,o,i1,i2))
     }
 
     /** Register as a storage.
