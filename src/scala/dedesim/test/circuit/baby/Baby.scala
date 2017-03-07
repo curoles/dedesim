@@ -371,7 +371,7 @@ class Baby(
         // If isExeFlowChange then pc = result
 
         monitor('rise -> clk) {
-sim.log( "Pipe    _WB_ EXE_ _RD_ DECD")
+sim.log( "Pipe     WB  EXE   RD  DECD")
 sim.log(f"Pipe PC=${pc_d3.int}%04x ${pc_d2.int}%04x ${pc_d1.int}%04x ${pc.int}%04x")
 sim.log(f"Pipe IR=${ir_d3.int}%04x ${ir_d2.int}%04x ${ir_d1.int}%04x ${ir.int}%04x")
 sim.log(f"Pipe AC=${acc_d3.int}%04x ${acc_d2.int}%04x ${acc_d1.int}%04x ${accRead.int}%04x")

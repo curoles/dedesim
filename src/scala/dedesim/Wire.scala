@@ -79,6 +79,12 @@ class WiresIn(parent: Component, name: String, val width: Int, initVal: Long = 0
         }
     }
 
+    type WiresFromTo = Tuple3[WiresIn, Int, Int]
+
+    def this(parent: Component, name: String, origins: WiresIn#WiresFromTo*) {
+        this(parent, name, 10, 0)//TODO FIXME
+    }
+
     def getSignal(bitNum: Int) = wires(bitNum).getSignal
 
     def getSignalAsInt: Long = {
