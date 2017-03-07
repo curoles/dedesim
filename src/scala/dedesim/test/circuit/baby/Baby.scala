@@ -61,6 +61,7 @@ class Baby(
     loadProgram(mem)
 
     val pc = wires("pc", Baby.ADDR_WIDTH)
+    val nextPC = wires("nextPC", Baby.ADDR_WIDTH)
 
     val frontEnd = new FrontEnd(
         parent = this,
@@ -68,6 +69,7 @@ class Baby(
         clk = clk,
         reset = reset,
         pc = pc,
+        nextPC = nextPC,
         ir = ir,
         memReadAddr = readAddr,
         memReadData = readData
@@ -95,6 +97,7 @@ class Baby(
         reset = reset,
         ir = ir,
         pc = pc,
+        nextPC = nextPC,
         memReadAddr = readAddr2,
         memReadData = readData2,
         memWriteEnable = writeEnable,
@@ -134,6 +137,7 @@ class Baby(
         clk: WireIn,
         reset: WireIn,
         pc: Wires,
+        nextPC: WiresIn,
         ir: Wires,
         memReadAddr: Wires,
         memReadData: WiresIn
@@ -149,10 +153,10 @@ class Baby(
         val new_pc = wires("new_pc", Baby.ADDR_WIDTH)
         dff(clk, output = pc, input = new_pc)
     
-        val next_pc = wires("next_pc", Baby.ADDR_WIDTH)
-        val addr_2 = wires("addr_2", Baby.ADDR_WIDTH, 2)
-        mux2to1(select = reset_d1, in2 = zero_addr, in1 = next_pc, output = new_pc)
-        adder(output = next_pc, in1 = pc, in2 = addr_2)
+        //val next_pc = wires("next_pc", Baby.ADDR_WIDTH)
+        //val addr_2 = wires("addr_2", Baby.ADDR_WIDTH, 2)
+        mux2to1(select = reset_d1, in2 = zero_addr, in1 = nextPC, output = new_pc)
+        //adder(output = next_pc, in1 = pc, in2 = addr_2)
     
     
         follow(output = memReadAddr, input = new_pc)
@@ -208,7 +212,7 @@ class Baby(
         reset: WireIn,
         ir: WiresIn,
         pc: WiresIn,
-        /*nextPC: Wires*/
+        nextPC: Wires,
         memReadAddr: Wires,
         memReadData: Wires,
         memWriteEnable: Wire,
@@ -315,6 +319,12 @@ class Baby(
         val acc_d3 = wires("acc_d3", Baby.DATA_WIDTH)
         dff(clk = clk, output = acc_d3, input = acc_d2)
 
+        val consecutivePC = wires("consecutivePC", Baby.ADDR_WIDTH)
+        val addr_2 = wires("addr_2", Baby.ADDR_WIDTH, 2)
+        adder(output = consecutivePC, in1 = pc, in2 = addr_2)
+
+        mux2to1(select = isSTP, output = nextPC, in1 = consecutivePC, in2 = pc)
+
         //////////////////////////////
         // Pipeline stage #2 READ DATA
         //////////////////////////////
@@ -365,7 +375,9 @@ class Baby(
         // If isMemStore then mem[addr] = aluResult
         follow(output = memWriteEnable, input = isMemStore_d3)
         follow(output = memWriteAddr, input = memAddr_d3)
-        //TODO FIXME merge/extend/concat result to 16 bits   follow(output = memWriteData, input = aluResult_d1)
+        val aluResultWord = wires("aluResultWord", Baby.WORD_WIDTH, 0)
+        aluResult_d1.wires.zipWithIndex.foreach{case (w,i) => aluResultWord.wires(i) = w}
+        follow(output = memWriteData, input = aluResultWord)
 
 
         // If isExeFlowChange then pc = result
