@@ -105,6 +105,8 @@ class Baby(
 
     /** Front End controls PC and IR.
      *
+     *  <hr>
+     *  <pre class="textdiagram" id="Baby.FrontEnd">
      *  +-------------------------------------------+
      *  |                                           |
      *  |    +---+                                  |
@@ -124,7 +126,7 @@ class Baby(
      *  0    +---+
      *         | reset
      *  -------+
-     *
+     *  </pre>
      */
     class FrontEnd(
         parent: Component,

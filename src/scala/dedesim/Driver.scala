@@ -25,7 +25,7 @@ object Driver {
      *
      *  @param period time from rising to falling edge
      *
-     *  <pre class="textdiagram">
+     *  <pre class="textdiagram" id="Driver.clock">
      *    +----------+          +----------+          +----------+
      *    |          |          |          |          |          |
      *  --+          +----------+          +----------+          +--
@@ -48,7 +48,7 @@ object Driver {
      *  @param lowPeriod time falling to rising edge
      *  @param hiPeriod time rising to falling edge
      *
-     *  <pre class="textdiagram">
+     *  <pre class="textdiagram" id="Driver.clock_async">
      *    +----------+       +----------+       +----------+
      *    |          |       |          |       |          |
      *  --+          +-------+          +-------+          +--

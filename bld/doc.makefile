@@ -14,11 +14,12 @@ doc: main_doc scala_doc
 
 .PHONY: doc_ditaa
 doc_ditaa: DITAA := $(DITAA)
-doc_ditaa: HTML_FILES = $(shell find $(abspath $(DOCS_BUILD_DIR)) -type f -name '*.html')
-doc_ditaa: FILES_WITH_DIAGRAMS = $(shell grep -l textdiagram $(HTML_FILES))
+#doc_ditaa: HTML_FILES = $(shell find $(abspath $(DOCS_BUILD_DIR)) -type f -name '*.html')
+#doc_ditaa: FILES_WITH_DIAGRAMS = $(shell grep -l textdiagram $(HTML_FILES))
+doc_ditaa: FILES_WITH_DIAGRAMS = $(shell grep -l textdiagram --include='*.html' -r $(abspath $(DOCS_BUILD_DIR)))
 doc_ditaa: doc
-	@echo Generate DITAA diagrams
+	@echo Generate DITAA diagrams for files '$(FILES_WITH_DIAGRAMS)'
 	@- $(foreach file,$(FILES_WITH_DIAGRAMS), \
-		cd $(dir $(file)) && $(DITAA) --html $(file) -o $(file) ; \
+		cd $(dir $(file)) && $(DITAA) --html '$(file)' -o '$(file)' ; \
 	)
 

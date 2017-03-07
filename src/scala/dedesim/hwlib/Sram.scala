@@ -101,19 +101,23 @@ class Test(
 {
     val clk = wire("clk")
     val readAddr = wires("readAddr", 12)
+    val readAddr2 = wires("readAddr2", 12)
     val writeAddr = wires("writeAddr", 12)
     val readData = wires("readData", 8)
+    val readData2 = wires("readData2", 8)
     val writeData = wires("writeData", 8)
     val writeEnable = wire("writeEnable")
 
-    val mem = new Sram1R1W(
+    val mem = new Sram2R1W(
         this,
         "mem",
         8,
-        1<<12,
+        1024,
         clk,
         readAddr,
         readData,
+        readAddr2,
+        readData2,
         writeEnable,
         writeAddr,
         writeData

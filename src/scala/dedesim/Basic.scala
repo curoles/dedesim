@@ -199,7 +199,7 @@ object Basic {
      *  @param write new value to store
      *
      *  <hr>
-     *  <pre class="textdiagram">
+     *  <pre class="textdiagram" id="Basic.register">
      *       +----------------------+
      *       |                      |
      *       |  +----+    +----+    |
