@@ -107,7 +107,7 @@ class RippleCarryAdder (
     Basic.follow(output = carry.wires(0), input = carryIn)
     carry.wires(width) = carryOut
 
-    for (wireId <- 0 to width) {
+    for (wireId <- 0 until width) {
         Adder.fullAdder(
             sum   = sum.wires(wireId),
             carry = carry.wires(wireId + 1),

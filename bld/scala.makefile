@@ -69,3 +69,4 @@ scala_test:
 	$(run_scala_test) curoles.dedesim.hwlib.AddrDecoderSpec
 	$(run_scala_test) curoles.dedesim.hwlib.WordSpec
 	$(run_scala_test) curoles.dedesim.hwlib.SramSpec
+	$(run_scala_test) curoles.dedesim.hwlib.ALUSpec

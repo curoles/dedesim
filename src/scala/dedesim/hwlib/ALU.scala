@@ -27,9 +27,9 @@ class ALU (
     overflow: Wire,  // V Overflow
     in1: WiresIn,
     in2: WiresIn,
-    cmdIn1AddIn2: WireIn,
-    cmdIn1SubIn2: WireIn,
-    cmdIn2SubIn1: WireIn
+    opIn1AddIn2: WireIn,
+    opIn1SubIn2: WireIn,
+    opIn2SubIn1: WireIn
 )
     extends Module(parent, name)
 {
@@ -41,9 +41,9 @@ class ALU (
     val invertIn1 = wire("invertIn1")
     val invertIn2 = wire("invertIn2")
 
-    Basic.orGate(output = invertIn1, cmdIn2SubIn1)
-    Basic.orGate(output = invertIn2, cmdIn1SubIn2)
-    Basic.orGate(output = carryIn, cmdIn1SubIn2, cmdIn2SubIn1)
+    Basic.orGate(output = invertIn1, opIn2SubIn1)
+    Basic.orGate(output = invertIn2, opIn1SubIn2)
+    Basic.orGate(output = carryIn, opIn1SubIn2, opIn2SubIn1)
 
     val adder = new AdderSubtractor(
         parent = this,
@@ -57,4 +57,49 @@ class ALU (
         in2 = in2,
         invertIn2 = invertIn2
     )
+}
+
+import org.scalatest.FlatSpec
+
+class ALUSpec extends FlatSpec {
+
+    val result = new Wires(null, "result", 32)
+    val in1 = new Wires(null, "in1", 32)
+    val in2 = new Wires(null, "in2", 32)
+    val carryOut = new Wire(null, "carryOut")
+    val overflow = new Wire(null, "overflow")
+    val opIn1AddIn2 = new Wire(null, "opIn1AddIn2")
+    val opIn1SubIn2 = new Wire(null, "opIn1SubIn2")
+    val opIn2SubIn1 = new Wire(null, "opIn2SubIn2")
+
+    val alu = new ALU (
+        parent = null,
+        name = "alu",
+        result = result,
+        carryOut = carryOut,
+        overflow = overflow,
+        in1 = in1,
+        in2 = in2,
+        opIn1AddIn2 = opIn1AddIn2,
+        opIn1SubIn2 = opIn1SubIn2,
+        opIn2SubIn1 = opIn2SubIn1
+    )
+
+    it should "sum 22 and 33 as 55" in {
+        in1.setSignalAsInt(33)
+        in2.setSignalAsInt(22)
+        opIn1AddIn2.setSignal(true)
+        sim.run(1)
+        assert(result.int == 55)
+    }
+
+    it should "33-22=11" in {
+        in1.setSignalAsInt(33)
+        in2.setSignalAsInt(22)
+        opIn1AddIn2.setSignal(false)
+        opIn1SubIn2.setSignal(true)
+        sim.run(1)
+        assert(result.int == 11)
+    }
+
 }
