@@ -463,6 +463,19 @@ sim.log(f"Pipe AB=____ ____ ${acc_or_bypass.int}%04x ____")
         mem.data(4).fromInteger(0x000a) //0008 000a
         mem.data(5).fromInteger(0x0001) //000a 0001
         mem.data(6).fromInteger(0x0000) //000c 0000
+
+        //test2.hex
+        //.text:
+        //0000 000c  0 LDA acc=mem[c]     ;acc=4
+        //0002 300e  3 SUB acc=acc-mem[e] ;acc=4-1=3
+        //0004 100c  1 STO mem[c]=acc     ;mem[c]=3
+        //0006 000c  0 LDA acc=mem[c]     ;acc=3
+        //0008 5000  5 JGE pc=0 if acc[11]!=0 
+        //000a 7000  7 STP
+        //.data:
+        //000c 0004
+        //000e 0001
+
     }
 }
 

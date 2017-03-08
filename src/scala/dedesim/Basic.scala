@@ -149,6 +149,18 @@ object Basic {
         }
     }
 
+    def xor2Gate(output: Wire, in1: WireIn, in2: WireIn) = {
+        def xorAction() = {
+            val in1Sig = in1.getSignal
+            val in2Sig = in2.getSignal
+            sim.afterDelay(orGateDelay) {
+                output setSignal (in1Sig ^ in2Sig)
+            }
+        }
+        in1 addAction (() => xorAction)
+        in2 addAction (() => xorAction)
+    }
+
     /** Monitors signals and calls back when any of them changed.
      */
     def monitor(components: Tuple2[Symbol,Trigger]*)(block: => Unit) = {
