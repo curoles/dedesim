@@ -54,9 +54,9 @@ object Adder {
      *
      *  @param in1 first input bit
      *  @param in2 second input bit
-     *  @param cin carry in
+     *  @param carryIn carry in
      *  @param sum is sum of 2 input bits and carry-in
-     *  @param carry carry-out
+     *  @param carryOut carry-out
      *
      *  <hr>
      *  <pre class="textdiagram" id="hwlib.Adder.fullAdder">
@@ -76,13 +76,13 @@ object Adder {
      *
      *  </pre>
      */
-    def fullAdder(sum: Wire, carry: Wire, cin: WireIn, in1: WireIn, in2: WireIn): Unit = {
+    def fullAdder(sum: Wire, carryOut: Wire, carryIn: WireIn, in1: WireIn, in2: WireIn): Unit = {
         val sum1 = new Wire(null, "sum1")
         val carry1 = new Wire(null, "carry1")
         val carry2 = new Wire(null, "carry2")
         halfAdder(sum = sum1, carry = carry1, in1 = in1, in2 = in2)
-        halfAdder(sum = sum, carry = carry2, in1 = sum1, in2 = cin)
-        Basic.or2Gate(output = carry, in1 = carry2, in2 = carry1)
+        halfAdder(sum = sum, carry = carry2, in1 = sum1, in2 = carryIn)
+        Basic.or2Gate(output = carryOut, in1 = carry2, in2 = carry1)
     }
 
 }
@@ -109,11 +109,11 @@ class RippleCarryAdder (
 
     for (wireId <- 0 until width) {
         Adder.fullAdder(
-            sum   = sum.wires(wireId),
-            carry = carry.wires(wireId + 1),
-            cin   = carry.wires(wireId),
-            in1   = in1.wires(wireId),
-            in2   = in2.wires(wireId)
+            sum      = sum.wires(wireId),
+            carryOut = carry.wires(wireId + 1),
+            carryIn  = carry.wires(wireId),
+            in1      = in1.wires(wireId),
+            in2      = in2.wires(wireId)
         )
     }
 

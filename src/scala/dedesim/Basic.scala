@@ -118,7 +118,7 @@ object Basic {
             val in1Sig = in1.getSignal
             val in2Sig = in2.getSignal
             sim.afterDelay(orGateDelay) {
-                output setSignal (in1Sig & in2Sig)
+                output setSignal (in1Sig | in2Sig)
             }
         }
         in1 addAction (() => orAction)
