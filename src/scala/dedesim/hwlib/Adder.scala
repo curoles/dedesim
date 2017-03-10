@@ -85,12 +85,59 @@ object Adder {
         Basic.or2Gate(output = carryOut, in1 = carry2, in2 = carry1)
     }
 
+    /** Full Adder with AND and XOR outputs.
+     *
+     *  @param in1 first input bit
+     *  @param in2 second input bit
+     *  @param carryIn carry in
+     *  @param sum is sum of 2 input bits and carry-in
+     *  @param carryOut carry-out
+     *
+     *  <hr>
+     *  <pre class="textdiagram" id="hwlib.Adder.fullAdderAndXor">
+     *
+     *                         -------------------------->
+     *                         |                       Xor
+     *            +------+     |   +------+
+     *            |Half  |  s1 |   |Half  |            Sum
+     *    a ----->|Adder +-----+-->|Adder +-------------->
+     *            |      |  c1     |      |  c2
+     *    b ----->|      +--+  +-->|      +--+   +---+
+     *            |      |  |  |   |      |  |   |OR |  Carry
+     *            +------+  |  |   +------+  +-->|   +--->
+     *                      |  |                 |   |
+     *                      +---------------+--->|   |
+     *                         |            |    +---+  And
+     *    cin -----------------+            +------------>
+     *
+     *  </pre>
+     */
+    def fullAdderAndXor(
+        sum: Wire,
+        xor: Wire,
+        and: Wire,
+        carryOut: Wire,
+        carryIn: WireIn,
+        in1: WireIn,
+        in2: WireIn
+    ): Unit =
+    {
+        val sum1 = new Wire(null, "sum1")
+        val carry1 = new Wire(null, "carry1")
+        val carry2 = new Wire(null, "carry2")
+        halfAdder(sum = sum1, carry = carry1, in1 = in1, in2 = in2)
+        halfAdder(sum = sum, carry = carry2, in1 = sum1, in2 = carryIn)
+        Basic.or2Gate(output = carryOut, in1 = carry2, in2 = carry1)
+    }
+
 }
 
 class RippleCarryAdder (
     parent: Component,
     name: String,
     sum: Wires,
+    xor: Wires,
+    and: Wires,
     carryOut: Wire,
     overflow: Wire,
     carryIn: WireIn,
@@ -108,8 +155,10 @@ class RippleCarryAdder (
     carry.wires(width) = carryOut
 
     for (wireId <- 0 until width) {
-        Adder.fullAdder(
+        Adder.fullAdderAndXor(
             sum      = sum.wires(wireId),
+            xor      = xor.wires(wireId),
+            and      = and.wires(wireId),
             carryOut = carry.wires(wireId + 1),
             carryIn  = carry.wires(wireId),
             in1      = in1.wires(wireId),
@@ -129,6 +178,8 @@ class AdderSubtractor (
     parent: Component,
     name: String,
     sum: Wires,
+    xor: Wires,
+    and: Wires,
     carryOut: Wire,  // C Carry-out
     overflow: Wire,  // V Overflow
     carryIn: WireIn,
@@ -157,6 +208,8 @@ class AdderSubtractor (
         parent = this,
         name = "adder",
         sum = sum,
+        xor = xor,
+        and = and,
         carryOut = carryOut,
         overflow = overflow,
         carryIn = carryIn,

@@ -205,6 +205,52 @@ object Basic {
         (output.wires, in1.wires, in2.wires).zipped.foreach((o,i1,i2) => mux2to1(select,o,i1,i2))
     }
 
+    /** MUX 4 to 1.
+     *
+     *
+     *  <hr>
+     *  <pre class="textdiagram" id="Basic.mux4to1">
+     *
+     * 
+     *          +-----+
+     *          |Mux  |
+     *  in1 --->|0    |  o1
+     *          |     +---+
+     *  in2 --->|1    |   |
+     *          +--+--+   |    +-----+
+     *             |      |    |Mux  |
+     *             |      +--->|0    |  output
+     *          +--+--+        |     +----->
+     *          |Mux  |   +--->|1    |
+     *  in1 --->|0    |   |    +--+--+
+     *          |     +---+       |
+     *  in2 --->|1    |  o2       |
+     *          +--+--+           |
+     *             |              |
+     *             | sel0         | sel1
+     *
+     *  </pre>
+     */
+    def mux4to1(select0: WireIn, select1: WireIn, output: Wire,
+        in1: WireIn, in2: WireIn, in3: WireIn, in4: WireIn): Unit =
+    {
+        val o1 = new Wire(null, "o1")
+        val o2 = new Wire(null, "o2")
+        mux2to1(output = o1, select = select0, in1 = in1, in2 = in2)
+        mux2to1(output = o2, select = select0, in1 = in3, in2 = in4)
+        mux2to1(output = output, select = select1, in1 = o1, in2 = o2)
+    }
+
+
+    def mux4to1(select0: WireIn, select1: WireIn, output: Wires,
+        in1: WiresIn, in2: WiresIn, in3: WiresIn, in4: WiresIn): Unit =
+    {
+        for (id <- 0 until output.width) {
+            mux4to1(select0, select1, output.wires(id),
+                in1.wires(id), in2.wires(id), in3.wires(id), in4.wires(id))
+        }
+    }
+
     /** Register as a storage.
      *
      *  @param read reads stored value

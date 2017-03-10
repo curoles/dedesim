@@ -45,9 +45,11 @@ class ALU (
     opIn2SubIn1: WireIn
     //add with carry
     //subtract with borrow
+    //xor
     //and
     //or
-    //xor
+    //nor
+    //nand
 )
     extends Module(parent, name)
 {
@@ -73,10 +75,17 @@ class ALU (
     Basic.mux2to1(output = in1_or_zero, select = setIn1Zero, in1 = in1, in2 = zero)
     Basic.mux2to1(output = in2_or_zero, select = setIn2Zero, in1 = in2, in2 = zero)
 
+    val xorResult = wires("xorResult", width)
+    val andResult = wires("andResult", width)
+    val orResult = wires("orResult", width)
+    Basic.andGate(output = orResult, xorResult, andResult)
+
     val adder = new AdderSubtractor(
         parent = this,
         name = "adder",
         sum = result,
+        xor = xorResult,
+        and = andResult,
         carryOut = carryOut,
         overflow = overflow,
         carryIn = carryIn,
@@ -85,6 +94,9 @@ class ALU (
         in2 = in2_or_zero,
         invertIn2 = invertIn2
     )
+
+    //mux4to1(select0 = , select1 = , output = result,
+    //    in1 = sumResult, in2 = xorResult, in3 = andResult, in4 = orResult)
 }
 
 import org.scalatest.FlatSpec
@@ -161,6 +173,8 @@ class ALUSpec extends FlatSpec with OneInstancePerTest {
         in1.setSignalAsInt(331)
         in2.setSignalAsInt(221)
         val rcaSum = new Wires(null, "rcaSum", 32)
+        val rcaXor = new Wires(null, "rcaXor", 32)
+        val rcaAnd = new Wires(null, "rcaAnd", 32)
         val rcaCarryOut = new Wire(null, "rcaCarryOut")
         val rcaOverflow = new Wire(null, "rcaOverflow")
         val rcaCarryIn = new Wire(null, "rcaCarryIn")
@@ -168,6 +182,8 @@ class ALUSpec extends FlatSpec with OneInstancePerTest {
             parent = null,
             name = "rca",
             sum = rcaSum,
+            xor = rcaXor,
+            and = rcaAnd,
             carryOut = rcaCarryOut,
             overflow = rcaOverflow,
             carryIn = rcaCarryIn,
