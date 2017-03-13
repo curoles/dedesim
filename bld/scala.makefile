@@ -19,6 +19,7 @@ SCALA_SRCs += dedesim/Driver.scala dedesim/Basic.scala
 SCALA_SRCs += dedesim/hwlib/Word.scala
 SCALA_SRCs += dedesim/hwlib/AddrDecoder.scala dedesim/hwlib/Sram.scala
 SCALA_SRCs += dedesim/hwlib/Adder.scala dedesim/hwlib/ALU.scala
+SCALA_SRCs += dedesim/hwlib/BarrelShifter.scala
 SCALA_SRCs += dedesim/VCDumper.scala
 SCALA_SRCs += dedesim/SimRunner.scala
 
