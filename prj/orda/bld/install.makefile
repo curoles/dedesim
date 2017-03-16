@@ -1,9 +1,14 @@
-.PHONY: install_jars
-install_jars: $(INSTALL_PATH)/orda_dv.jar
+.PHONY: installation
+installation: install_jars install_scripts
 
-$(INSTALL_PATH)/orda_dv.jar: $(INSTALL_PATH) $(SCALA_DV_OBJS)
+.PHONY: install_jars
+install_jars: $(INSTALL_PATH)/orda_dsn.jar $(INSTALL_PATH)/orda_dv.jar
+
+$(INSTALL_PATH)/orda_dv.jar: $(INSTALL_PATH) $(SCALA_DV_OBJS) scala_dv
 	jar cvf $@ -C $(SCALA_CLASS_DIR) curoles/orda/dv
 
+$(INSTALL_PATH)/orda_dsn.jar: $(INSTALL_PATH) $(SCALA_DSN_OBJS) scala_dsn
+	jar cvf $@ -C $(SCALA_CLASS_DIR) curoles/orda/design
 
 
 

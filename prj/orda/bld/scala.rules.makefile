@@ -6,8 +6,7 @@ ifndef FASTSCALAC
 $(error FASTSCALAC is not defined)
 endif
 
-#SCALAC_FLAGS := -cp "$(SCALA_CLASS_DIR):$(SCALA_EXTRA_LIB_DIR)/*"
-SCALAC_FLAGS := -cp "$(SCALA_CLASS_DIR)"
+SCALAC_FLAGS := -cp "$(SCALA_CLASS_DIR):$(DEDESIM_LIB_DIR)/*"
 SCALAC_FLAGS += -Xlint -Xfatal-warnings
 
 THE_SCALAC := $(FASTSCALAC)

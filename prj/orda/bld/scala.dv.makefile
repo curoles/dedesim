@@ -11,7 +11,7 @@ SCALA_DV_OBJs := $(SCALA_DV_SRCs:.scala=.class)
 SCALA_DV_OBJS := $(addprefix $(SCALA_CUROLES_CLASS_DIR)/,$(SCALA_DV_OBJs))
 
 .PHONY: scala_dv
-scala_dv: $(SCALA_CLASS_DIR) $(SCALA_DV_OBJS)
+scala_dv: $(SCALA_CLASS_DIR) scala_dsn $(SCALA_DV_OBJS)
 	@echo Building target $@
 	@$(THE_SCALAC) $(SCALAC_FLAGS) -d $(SCALA_CLASS_DIR) $(SCALA_DV_SRCS)
 

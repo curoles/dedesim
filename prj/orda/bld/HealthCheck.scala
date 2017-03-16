@@ -1,8 +1,8 @@
-println("DeDeSim job script \"Health Check\"")
+// println("DeDeSim job script \"Health Check\"")
 
 import curoles.orda.dv.TestBench
 
-val circuit = new TestBench()//simulator.root, "TB")
+val circuit = new TestBench(simulator.root, "TB")
 
 sim.run(120)
 
