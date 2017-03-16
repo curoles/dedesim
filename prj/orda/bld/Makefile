@@ -7,19 +7,14 @@
 #.PHONY: all
 #all: installation
 
-#EMPTY :=
-#SPACE := $(EMPTY) $(EMPTY)
 
-# Path where applications are installed.
-INSTALL_PATH := $(abspath ./install)
+# Path to build files sources.
+SRC_BLD := $(SOURCE_PATH)/bld
 
-# Path to build files
-BLD := $(SOURCE_PATH)/bld
-
-# Scala version
-#SCALA_MAJOR_VER := $(shell $(SCALAC) -version 2>&1 | cut -d ' ' -f 4 | cut -d '.' -f 1,2)
-#$(info Using Scala major release $(SCALA_MAJOR_VER))
 
 # Include other makefiles
-include $(BLD)/doc.makefile
-
+include $(SRC_BLD)/path.makefile
+include $(SRC_BLD)/scala.rules.makefile
+include $(SRC_BLD)/scala.dv.makefile
+include $(SRC_BLD)/doc.makefile
+include $(SRC_BLD)/install.makefile

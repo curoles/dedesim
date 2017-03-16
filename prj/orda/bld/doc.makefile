@@ -1,4 +1,3 @@
-DOCS_BUILD_DIR := ./build/doc
 MAIN_DOCS_BUILD_DIR := $(DOCS_BUILD_DIR)/main
 
 .PHONY: main_doc
