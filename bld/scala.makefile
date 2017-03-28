@@ -20,6 +20,7 @@ SCALA_SRCs += dedesim/hwlib/Word.scala
 SCALA_SRCs += dedesim/hwlib/AddrDecoder.scala dedesim/hwlib/Sram.scala
 SCALA_SRCs += dedesim/hwlib/Adder.scala dedesim/hwlib/ALU.scala
 SCALA_SRCs += dedesim/hwlib/BarrelShifter.scala
+SCALA_SRCs += dedesim/hwlib/Cache.scala
 SCALA_SRCs += dedesim/VCDumper.scala
 SCALA_SRCs += dedesim/SimRunner.scala
 
@@ -72,3 +73,4 @@ scala_test:
 	$(run_scala_test) curoles.dedesim.hwlib.SramSpec
 	$(run_scala_test) curoles.dedesim.hwlib.ShifterSpec
 	$(run_scala_test) curoles.dedesim.hwlib.ALUSpec
+	$(run_scala_test) curoles.dedesim.hwlib.CacheSpec
