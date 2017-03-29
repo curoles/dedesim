@@ -52,22 +52,23 @@ class CacheSet (
 /**
   *
   * https://en.wikipedia.org/wiki/CPU_cache
+  * http://www.ijcaonline.org/research/volume129/number1/chauan-2015-ijca-906787.pdf
   *
   * <hr>
-  * <pre class="textdiagram" id="hwlib.Cache.entry">
+  * <pre class="textdiagram" id="hwlib.CacheArray.entry">
   * +-----+------------+-----------+
   * | tag | data block | flag bits |
   * +-----+------------+-----------+
   * </pre>
   *
   * <hr>
-  * <pre class="textdiagram" id="hwlib.Cache.address">
+  * <pre class="textdiagram" id="hwlib.CacheArray.address">
   * +-----+------------+--------------+
   * | tag |   index    | block offset |
   * +-----+------------+--------------+
   * </pre>
   */
-class Cache (
+class ReadableCacheArray (
     parent: Component,
     name: String,
     val tagWidth: Int,
@@ -75,9 +76,13 @@ class Cache (
     val flagsWidth: Int,
     val nrSets: Int,
     val nrWays: Int,
-    readAddr: WiresIn,
+    // Interfrace with CPU/Driver
     readData: Wires,
-    isCacheHit: Wire
+    // Interface with Cache Controller
+    index: WiresIn,
+    offset: WiresIn,
+    // Interface with Memory
+    memReadData: WiresIn
 )
     extends Module(parent, name)
 {
@@ -95,6 +100,66 @@ class Cache (
     //def getAddrTag =
 }
 
+class CacheArray (
+    parent: Component,
+    name: String,
+    val tagWidth: Int,
+    val dataWidth: Int,
+    val flagsWidth: Int,
+    val nrSets: Int,
+    val nrWays: Int,
+    // Interfrace with CPU/Driver
+    readData: Wires,
+    writeData: WiresIn,
+    // Interface with Cache Controller
+    index: WiresIn,
+    offset: WiresIn,
+    //refill
+    //update
+    //isCacheHit: Wire
+    // Interface with Memory
+    memReadData: WiresIn,
+    memWriteData: Wires
+)
+    extends ReadableCacheArray(
+        parent = parent,
+        name = name,
+        tagWidth = tagWidth,
+        dataWidth = dataWidth,
+        flagsWidth = flagsWidth,
+        nrSets = nrSets,
+        nrWays = nrWays,
+        // Interfrace with CPU/Driver
+        readData = readData,
+        // Interface with Cache Controller
+        index = index,
+        offset = offset,
+        // Interface with Memory
+        memReadData = memReadData
+    )
+{
+
+}
+
+class CacheController (
+    parent: Component,
+    name: String
+) //? extends ReadableCacheController ???
+{
+
+
+}
+
+class Cache (
+    parent: Component,
+    name: String
+)
+    extends Module(parent, name)
+{
+    //val array = new CacheArray
+    //val controller = new CacheController
+}
+
 import org.scalatest.FlatSpec
 import org.scalatest.OneInstancePerTest
 
@@ -106,7 +171,7 @@ class CacheSpec extends FlatSpec with OneInstancePerTest {
     val readData = new Wires(null, "readData", 16)
     val isCacheHit = new Wire(null, "isCacheHit")
 
-    val cache = new Cache(
+    /*val cache = new CacheArray(
         parent = null,
         name = "cache",
         tagWidth = 3,
@@ -117,5 +182,5 @@ class CacheSpec extends FlatSpec with OneInstancePerTest {
         readAddr = readAddr,
         readData = readData,
         isCacheHit = isCacheHit
-    )
+    )*/
 }
