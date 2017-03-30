@@ -15,6 +15,7 @@ object Basic {
     var inverterDelay = 0
     var andGateDelay = 0
     var orGateDelay = 0
+    var xorGateDelay = 0
     var muxDelay = 0
 
     /** Inverts signal level */
@@ -153,13 +154,33 @@ object Basic {
         def xorAction() = {
             val in1Sig = in1.getSignal
             val in2Sig = in2.getSignal
-            sim.afterDelay(orGateDelay) {
+            sim.afterDelay(xorGateDelay) {
                 output setSignal (in1Sig ^ in2Sig)
             }
         }
         in1 addAction (() => xorAction)
         in2 addAction (() => xorAction)
     }
+
+    def compare(equal: Wire, in1: WireIn, in2: WireIn): Unit = {
+        def compareAction() = {
+            val in1Sig = in1.getSignal
+            val in2Sig = in2.getSignal
+            sim.afterDelay(xorGateDelay + inverterDelay) {
+                equal setSignal (!(in1Sig ^ in2Sig))
+            }
+        }
+        in1 addAction (() => compareAction)
+        in2 addAction (() => compareAction)
+    }
+
+    def compare(equal: Wire, in1: WiresIn, in2: WiresIn): Unit = {
+        require(in1.width == in2.width)
+        val outputs = new Wires(null, "outputs", in1.width)
+        (outputs.wires, in1.wires, in2.wires).zipped.foreach((o,i1,i2) => compare(o,i1,i2))
+        andGate(output = equal, outputs.wires :_*)
+    }
+
 
     /** Monitors signals and calls back when any of them changed.
      */
@@ -408,6 +429,18 @@ class BasicGatesSpec extends FlatSpec {
         Basic.orGate(output = allOred, in1, in2, in3)
         sim.run(1)
         assert(allOred.getSignalAsInt == 0x7)
+    }
+
+    it should "5 = 5" in {
+        val in1 = new Wires(null, "in1", 5, 0x5)
+        val in2 = new Wires(null, "in2", 5, 0x5)
+        val isEq = new Wire(null, "isEq")
+        Basic.compare(equal = isEq, in1, in2)
+        sim.run(1)
+        assert(isEq.getSignal == true)
+        in2.setSignalAsInt(0x7)
+        sim.run(1)
+        assert(isEq.getSignal == false)
     }
 
 }

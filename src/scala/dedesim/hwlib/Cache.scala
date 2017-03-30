@@ -103,11 +103,11 @@ class ReadableCacheArray (
 class CacheArray (
     parent: Component,
     name: String,
-    val tagWidth: Int,
-    val dataWidth: Int,
-    val flagsWidth: Int,
-    val nrSets: Int,
-    val nrWays: Int,
+    override val tagWidth: Int,
+    override val dataWidth: Int,
+    override val flagsWidth: Int,
+    override val nrSets: Int,
+    override val nrWays: Int,
     // Interfrace with CPU/Driver
     readData: Wires,
     writeData: WiresIn,
