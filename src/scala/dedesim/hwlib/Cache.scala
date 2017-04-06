@@ -80,6 +80,7 @@ class ReadableCacheArray (
     readData: Wires,
     // Interface with Cache Controller
     index: WiresIn,
+    tag: WiresIn,
     offset: WiresIn,
     // Interface with Memory
     memReadData: WiresIn
@@ -98,6 +99,35 @@ class ReadableCacheArray (
     //def getAddrBlockOffset = readAddr.getSignalAsInt(from = 0, to = blockOffsetWidth - 1)
     //def getAddrIndex =
     //def getAddrTag =
+
+    val hit = wire("hit")
+
+    def checkHitAndReadData() = {
+        def checkHitAction() = {
+            val way = compareTagIfValid(0)
+            val isHit = (way >= 0)
+            sim.afterDelay(0) {
+                hit.setSignal(isHit)
+                if (isHit) readData.setSignalAsInt(sets(index.int.toInt).ways(way).data.toInteger)
+            }
+        }
+        index addAction (() => checkHitAction)
+        tag addAction (() => checkHitAction)
+    }
+
+    // @return way that hit
+    def compareTagIfValid(validFlagBit: Int = 0): Int = {
+        for (way <- 0 until nrWays) {
+            val isValid = sets(index.int.toInt).ways(way).flags.getBit(validFlagBit)
+            if (isValid) {
+                val isWayHit = (tag.int == sets(index.int.toInt).ways(way).tag.toInteger)
+                if (isWayHit) {
+                    return way
+                }
+            }
+        }
+        return -1
+    }
 }
 
 class CacheArray (
@@ -113,6 +143,7 @@ class CacheArray (
     writeData: WiresIn,
     // Interface with Cache Controller
     index: WiresIn,
+    tag: WiresIn,
     offset: WiresIn,
     //refill
     //update
@@ -133,6 +164,7 @@ class CacheArray (
         readData = readData,
         // Interface with Cache Controller
         index = index,
+        tag = tag,
         offset = offset,
         // Interface with Memory
         memReadData = memReadData

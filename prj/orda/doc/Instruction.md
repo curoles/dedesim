@@ -3,7 +3,7 @@
 <pre class="textdiagram" id="orda.Istruction.1word">
   |<------------------- Destination ----------------------------->|<--------------------- Source -------------------------------->|
   |                                                               |                                                               |
-  |                                                       | T |S/L|                                                       | T |S/L|
+  |                                                       | D |S/L|                                                       | T |S/L|
   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -14,6 +14,7 @@
 
 * S/L - short or long value format, Long means that an additional word brings additional 32 bits to the value.
 * T - type, Imm|Reg
+* D - destination or 2nd source; 2nd source can only be Reg type, destination is implied.
 
 |Bit 16 S/L | Bit 0 S/L | Number of words  |
 | :-------: | :-------: | :--------------: |
